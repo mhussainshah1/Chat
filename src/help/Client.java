@@ -92,5 +92,4 @@ class ReceivedMessagesHandler implements Runnable {
   public static String getTagValue(String xml){
     return  xml.split(">")[2].split("<")[0] + xml.split("<span>")[1].split("</span>")[0];
   }
-
 }

@@ -107,10 +107,8 @@ public class ClientGui extends Thread{
     });
 
     // Click on send button
-    jsbtn.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent ae) {
+    jsbtn.addActionListener((ActionEvent ae) -> {
         sendMessage();
-      }
     });
 
     // Connection view
@@ -155,46 +153,43 @@ public class ClientGui extends Thread{
         +"</ul><br/>");
 
     // On connect
-    jcbtn.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent ae) {
+    jcbtn.addActionListener((ActionEvent ae) -> {
         try {
-          name = jtfName.getText();
-          String port = jtfport.getText();
-          serverName = jtfAddr.getText();
-          PORT = Integer.parseInt(port);
-
-          appendToPane(jtextFilDiscu, "<span>Connecting to " + serverName + " on port " + PORT + "...</span>");
-          server = new Socket(serverName, PORT);
-
-          appendToPane(jtextFilDiscu, "<span>Connected to " +
-              server.getRemoteSocketAddress()+"</span>");
-
-          input = new BufferedReader(new InputStreamReader(server.getInputStream()));
-          output = new PrintWriter(server.getOutputStream(), true);
-
-          // send nickname to server
-          output.println(name);
-
-          // create new Read Thread
-          read = new Read();
-          read.start();
-          jfr.remove(jtfName);
-          jfr.remove(jtfport);
-          jfr.remove(jtfAddr);
-          jfr.remove(jcbtn);
-          jfr.add(jsbtn);
-          jfr.add(jtextInputChatSP);
-          jfr.add(jsbtndeco);
-          jfr.revalidate();
-          jfr.repaint();
-          jtextFilDiscu.setBackground(Color.WHITE);
-          jtextListUsers.setBackground(Color.WHITE);
-        } catch (Exception ex) {
-          appendToPane(jtextFilDiscu, "<span>Could not connect to Server</span>");
-          JOptionPane.showMessageDialog(jfr, ex.getMessage());
+            name = jtfName.getText();
+            String port = jtfport.getText();
+            serverName = jtfAddr.getText();
+            PORT = Integer.parseInt(port);
+            
+            appendToPane(jtextFilDiscu, "<span>Connecting to " + serverName + " on port " + PORT + "...</span>");
+            server = new Socket(serverName, PORT);
+            
+            appendToPane(jtextFilDiscu, "<span>Connected to " +
+                    server.getRemoteSocketAddress()+"</span>");
+            
+            input = new BufferedReader(new InputStreamReader(server.getInputStream()));
+            output = new PrintWriter(server.getOutputStream(), true);
+            
+            // send nickname to server
+            output.println(name);
+            
+            // create new Read Thread
+            read = new Read();
+            read.start();
+            jfr.remove(jtfName);
+            jfr.remove(jtfport);
+            jfr.remove(jtfAddr);
+            jfr.remove(jcbtn);
+            jfr.add(jsbtn);
+            jfr.add(jtextInputChatSP);
+            jfr.add(jsbtndeco);
+            jfr.revalidate();
+            jfr.repaint();
+            jtextFilDiscu.setBackground(Color.WHITE);
+            jtextListUsers.setBackground(Color.WHITE);
+        } catch (IOException | NumberFormatException ex) {
+            appendToPane(jtextFilDiscu, "<span>Could not connect to Server</span>");
+            JOptionPane.showMessageDialog(jfr, ex.getMessage());
         }
-      }
-
     });
 
     // on deco
@@ -304,6 +299,7 @@ public class ClientGui extends Thread{
         }
         catch (IOException ex) {
           System.err.println("Failed to parse incoming message");
+          ex.printStackTrace();
         }
       }
     }
@@ -316,7 +312,7 @@ public class ClientGui extends Thread{
     try {
       editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
       tp.setCaretPosition(doc.getLength());
-    } catch(Exception e){
+    } catch(IOException | BadLocationException e){
       e.printStackTrace();
     }
   }
