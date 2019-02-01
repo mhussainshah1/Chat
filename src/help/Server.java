@@ -30,6 +30,7 @@ public class Server {
 
   public void run() throws IOException {
     server = new ServerSocket(port) {
+      @Override
       protected void finalize() throws IOException {
         this.close();
       }
@@ -216,6 +217,7 @@ class User {
   }
 
   // print user with his color
+  @Override
   public String toString(){
 
     return "<u><span style='color:"+ this.color
