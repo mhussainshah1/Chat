@@ -102,6 +102,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
 
         setTitle(PRODUCT_NAME);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent evt) {
                 disconnectChat();
                 System.exit(0);

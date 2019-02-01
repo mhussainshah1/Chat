@@ -28,6 +28,9 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
     private MessageCanvas messageCanvas;//Replace with JtextPane
     private Panel EmotionPanel;
 
+    public static void main(String[] args) {
+        
+    }
     PrivateChat(ChatClient Parent, String ToUserName) {
         chatclient = Parent;
         UserName = ToUserName;

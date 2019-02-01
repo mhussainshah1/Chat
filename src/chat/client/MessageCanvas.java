@@ -37,7 +37,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
     MessageCanvas(ChatClient Parent) {
         chatclient = Parent;
         /**
-         * *** Waiting for Loadind Chat	Client *********
+         * *** Waiting for Loading Chat	Client *********
          */
         dimension = chatclient.getSize();
         MessageArray = new ArrayList();
