@@ -1,9 +1,8 @@
 ### Chat
 
-##		ADVANCED JAVA CHAT APPLICATION 
-##			Developed By
-##			  Muhammad Shah
-===============================================================================================
+### ADVANCED JAVA CHAT APPLICATION 
+## Developed By
+## Muhammad Shah
 
 This Java Chat Application developed by my own interest, and now i am interested to share my source code with other peoples to get learn from it. I request everyone, if suppose you are using this for any college project, just dont submit as it is. Try to understand the coding and use this application for a reference and develop with your own knowledge. In Anytime, If you need any help contact me through mail.
 
