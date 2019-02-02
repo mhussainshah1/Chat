@@ -16,6 +16,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class PrivateChat extends Frame implements CommonSettings, KeyListener, ActionListener {
+    public static void main(String[] args) {
+        
+    }
 
     private ChatClient chatclient;
     protected String UserName;
@@ -28,9 +31,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
     private MessageCanvas messageCanvas;//Replace with JtextPane
     private Panel EmotionPanel;
 
-    public static void main(String[] args) {
-        
-    }
+
     PrivateChat(ChatClient Parent, String ToUserName) {
         chatclient = Parent;
         UserName = ToUserName;
@@ -68,7 +69,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
 
         Panel MessagePanel = new Panel(new BorderLayout());
         messageCanvas = new MessageCanvas(chatclient);
-        MessageScrollView = new ScrollView(messageCanvas, true, true, 
+        MessageScrollView = new ScrollView(messageCanvas, true, true,
                 TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
         messageCanvas.scrollview = MessageScrollView;
         MessagePanel.add("Center", MessageScrollView);
@@ -109,7 +110,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
 
         EmotionPanel = new Panel(new BorderLayout());
         emotioncanvas = new EmotionCanvas(chatclient, this);
-        EmotionScrollView = new ScrollView(emotioncanvas, true, true, 
+        EmotionScrollView = new ScrollView(emotioncanvas, true, true,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
         emotioncanvas.scrollview = EmotionScrollView;
         /**
@@ -118,7 +119,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
         emotioncanvas.AddIconsToMessageObject();
         EmotionPanel.add("Center", EmotionScrollView);
         EmotionPanel.setVisible(false);
-        EmotionPanel.setBounds(5, 320, 
+        EmotionPanel.setBounds(5, 320,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT);
         add(EmotionPanel);
 
@@ -129,8 +130,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
     }
 
     /**
-     * @param evt
-     * *********Action Listener coding *********
+     * @param evt *********Action Listener coding *********
      */
     @Override
     public void actionPerformed(ActionEvent evt) {

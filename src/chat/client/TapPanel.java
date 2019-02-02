@@ -11,7 +11,7 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
     protected ImageCanvas imagecanvas;
     protected ListViewCanvas UserCanvas, RoomCanvas;
     Button CmdChangeRoom, CmdIgnoreUser, CmdSendDirect;
-    
+
     TapPanel(ChatClient parent) {
         /**
          * *********Initialize the Components**********
@@ -100,6 +100,7 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
          * ******Common Things**********
          */
     }
+
     /**
      * *********Action Listener coding *********
      */

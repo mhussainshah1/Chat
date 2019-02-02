@@ -14,10 +14,6 @@ import java.util.StringTokenizer;
 
 public class MessageCanvas extends Canvas implements CommonSettings {
 
-
-    /**
-     * *********Global Variable Declarations***************
-     */
     Dimension offDimension, dimension;
     Image offImage;
     Graphics offGraphics;
@@ -31,6 +27,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
     Font UserNameFont, TextFont;
     StringTokenizer tokenizer;
     String TokenString;
+
     /**
      * ********Constructor Of Image Canvas ************
      */
@@ -49,6 +46,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         setFont(chatclient.getFont());
         fontmetrics = chatclient.getFontMetrics(chatclient.getFont());
     }
+
     /**
      * **** Function To Clear All the Item From ListArray ********
      */
@@ -59,6 +57,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         MessageCount = 0;
         scrollview.setValues(TotalWidth, TotalHeight);
     }
+
     protected void addMessageToMessageObject(String Message, int MessageType) {
         String m_Message = "";
         tokenizer = new StringTokenizer(Message, " ");
@@ -74,6 +73,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
 
         AddMessage(m_Message, MessageType);
     }
+
     private void AddMessage(String Message, int MessageType) {
         int m_startY = DEFAULT_MESSAGE_CANVAS_POSITION;
         if (MessageArray.size() > 0) {
@@ -111,6 +111,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         scrollview.setScrollSteps(2, 1, DEFAULT_SCROLLING_HEIGHT);
         repaint();
     }
+
     private void PaintFrame(Graphics graphics) {
         if (MessageCount < 1) {
             return;
@@ -134,6 +135,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
             PaintMessageIntoCanvas(graphics, messageobject);
         }
     }
+
     private void PaintMessageIntoCanvas(Graphics graphics, MessageObject messageObject) {
         graphics.setColor(Color.black);
         int m_YPos = messageobject.StartY - YOffset;
@@ -220,6 +222,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         chatclient.getGraphics().setFont(UserNameFont);
         fontmetrics = chatclient.getGraphics().getFontMetrics();
     }
+
     public boolean handleEvent(Event event) {
         if (event.id == 1001 && event.arg == scrollview) {
             if (event.modifiers == 1) {
@@ -233,9 +236,11 @@ public class MessageCanvas extends Canvas implements CommonSettings {
             return super.handleEvent(event);
         }
     }
+
     public boolean mouseDown(Event event, int i, int j) {
         return true;
     }
+
     public void paint(Graphics graphics) {
         /**
          * ***********Double Buffering*************
@@ -267,6 +272,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
          */
         graphics.drawImage(offImage, 0, 0, null);
     }
+
     public void update(Graphics graphics) {
         paint(graphics);
     }

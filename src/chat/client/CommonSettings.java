@@ -3,6 +3,7 @@ package chat.client;
 import java.awt.Color;
 
 public interface CommonSettings {
+
     int MAX_COLOR = 8;
     int TOP_PANEL_START_POS = 10;
     int DEFAULT_ICON_WIDTH = 30;
@@ -54,6 +55,6 @@ public interface CommonSettings {
     Color MESSAGE_CANVAS = Color.BLACK;                             //5
     Color TOP_PANEL_BACKGROUND = Color.YELLOW;                      //6
     Color LABEL_TEXT_COLOR = Color.WHITE;                           //7
-    
+
     int PORT_NUMBER = 1436;
 }

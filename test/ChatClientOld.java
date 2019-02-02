@@ -1,5 +1,4 @@
 
-
 import chat.client.CommonSettings;
 import chat.client.ImagePanel;
 import chat.client.MessageCanvas;
@@ -38,16 +37,17 @@ import java.awt.MenuItem;
  * ********Chat Client*************
  */
 public class ChatClientOld extends Frame implements Serializable, Runnable, KeyListener, ActionListener, CommonSettings {
+
     private String userName, userRoom, serverName, appletStatus, chatLogo, bannerName, proxyHost, serverData, roomList, splitString;
     private int serverPort, proxyPort, iconCount, totalUserCount, count;
     private boolean startFlag, isProxy;
     private Socket socket;
     private DataInputStream in;
-    private DataOutputStream out;    
-    private StringBuffer stringBuffer;    
+    private DataOutputStream out;
+    private StringBuffer stringBuffer;
     private Thread thread;
-    private StringTokenizer tokenizer;   
-    
+    private StringTokenizer tokenizer;
+
     //Frame
     private Image ImgLogo, ImgBanner;
     private Color[] colorMap;
@@ -60,7 +60,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
     private TapPanel tapPanel;
     private TextField TxtMessage;
     private Button CmdSend, CmdExit;
-    private Font textFont;    
+    private Font textFont;
     protected PrivateChat[] privatewindow;
     protected int PrivateWindowCount;
     private InformationDialog dialog;
@@ -68,8 +68,8 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
     private MenuItem loginItem;
     private MenuItem disconnectItem;
     private MenuItem seperatorItem;
-    private MenuItem quitItem, aboutItem;        
-    
+    private MenuItem quitItem, aboutItem;
+
     ChatClientOld() {
         toolkit = Toolkit.getDefaultToolkit();
         if (toolkit.getScreenSize().getWidth() > 778) {
@@ -205,24 +205,27 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         initializeAppletComponents();
 
     }
-    
+
     public static void main(String args[]) {
         ChatClientOld mainFrame = new ChatClientOld();
     }
-    
+
     public MessageCanvas getMessageCanvas() {
         return messageCanvas;
     }
+
     public int getIconCount() {
         return iconCount;
     }
-    public Image getIcon(int index){
+
+    public Image getIcon(int index) {
         return IconArray[index];
     }
-    
-    public String getUserName(){
+
+    public String getUserName() {
         return userName;
     }
+
     private void connectToServer() {
         /**
          * *********Initialize the Socket******
@@ -260,7 +263,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             ie.printStackTrace();
         }
     }
-    
+
     private void sendMessageToServer(String Message) {
         try {
             out.writeBytes(Message + "\r\n");
@@ -269,6 +272,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             ie.printStackTrace();
         }
     }
+
     /**
      * *****Initialize all the Applet Components*******
      */
@@ -352,6 +356,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
 
         loginToChat();
     }
+
     private void loginToChat() {
         /**
          * ******* Open the Dialog ********
@@ -372,6 +377,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             connectToServer();
         }
     }
+
     /**
      * *******Button Events ****
      */
@@ -403,6 +409,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         }
 
     }
+
     /**
      * ******* Key Listener Event ************
      */
@@ -411,10 +418,13 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             sendMessage();
         }
     }
+
     public void keyTyped(KeyEvent e) {
     }
+
     public void keyReleased(KeyEvent e) {
     }
+
     /**
      * ****** Function To Send MESS Rfc to Server ************
      */
@@ -427,6 +437,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         TxtMessage.setText("");
         TxtMessage.requestFocus();
     }
+
     /**
      * *******Function To Update the Information Label****
      */
@@ -444,6 +455,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         InformationLabel.setText(stringBuffer.toString());
 
     }
+
     /**
      * ******Implements the Thread ***************
      */
@@ -662,6 +674,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             }
         }
     }
+
     /**
      * *** Enable the Private Chat when the End User logged out***
      */
@@ -674,6 +687,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             }
         }
     }
+
     /**
      * *** Disable the Private Chat when the End User logged out***
      */
@@ -686,12 +700,14 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             }
         }
     }
+
     /**
      * *****Function To Send Private Message To Server **********
      */
     protected void sentPrivateMessageToServer(String Message, String ToUserName) {
         sendMessageToServer("PRIV " + ToUserName + "~" + userName + ": " + Message);
     }
+
     /**
      * ***** Function To Remove Private Window **************
      */
@@ -709,6 +725,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
 
         PrivateWindowCount--;
     }
+
     /**
      * ******* Function to Change Room ******
      */
@@ -725,12 +742,14 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
 
         sendMessageToServer("CHRO " + userName + "~" + tapPanel.RoomCanvas.SelectedUser);
     }
+
     /**
      * ***** Function to Send a RFC for Get a Room User Count *******
      */
     protected void getRoomUserCount(String RoomName) {
         sendMessageToServer("ROCO " + RoomName);
     }
+
     /**
      * ****** Function to Set the Image Name into Text Field ***********
      */
@@ -741,6 +760,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             TxtMessage.setText(TxtMessage.getText() + " " + "~~" + ImageName + " ");
         }
     }
+
     /**
      * *******Function to Destroy all the Objects*******
      */
@@ -768,6 +788,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         startFlag = false;
         setAppletStatus("ADMIN: CONNECTION TO THE SERVER CLOSED.");
     }
+
     /**
      * *** Function To Disable All Components *******
      */
@@ -782,6 +803,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         userRoom = "";
         totalUserCount = 0;
     }
+
     /**
      * *** Function To Enable All Components *******
      */
@@ -792,6 +814,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         disconnectItem.setEnabled(true);
         loginItem.setEnabled(false);
     }
+
     /**
      * *****Diconnect Chat *******
      */
@@ -801,6 +824,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             quitConnection(QUIT_TYPE_DEFAULT);
         }
     }
+
     /**
      * ********Setting the appletStatus*******
      */
@@ -809,9 +833,11 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
             messageCanvas.AddMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
         }
     }
+
     public TapPanel getTapPanel() {
         return tapPanel;
     }
+
     public Font getTextFont() {
         return textFont;
     }

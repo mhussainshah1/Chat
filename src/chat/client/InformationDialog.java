@@ -28,19 +28,19 @@ public class InformationDialog extends JDialog {
         properties = this.getProperties();
 
         initComponents();
-        
+
         if (properties.getProperty("TurtleServerName") != null) {
             txtServerName.setText(properties.getProperty("TurtleServerName"));
         } else {
             txtServerName.setText("localhost");
         }
-        
+
         if (properties.getProperty("TurtleServerPort") != null) {
             txtServerPort.setText(properties.getProperty("TurtleServerPort"));
         } else {
             txtServerPort.setText(Integer.toString(PORT_NUMBER));
         }
-        
+
         //setSize(250, 400);
         chatClient.setVisible(true);//show();
         setVisible(true);

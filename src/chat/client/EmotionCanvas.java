@@ -11,18 +11,12 @@ import java.util.ArrayList;
 
 public class EmotionCanvas extends Canvas implements CommonSettings {
 
-    /**
-     * *********Global Variable Declarations***************
-     */
-    Dimension offDimension;
-    Dimension dimension;
+    Dimension offDimension, dimension;
     Image offImage;
     Graphics offGraphics;
     ChatClient chatclient;
     ArrayList<MessageObject> IconArray;
-    int count;
-    int XOffset;
-    int YOffset;
+    int count, XOffset, YOffset;
     MessageObject messageobject;
     ScrollView scrollview;
     String SelectedImage;

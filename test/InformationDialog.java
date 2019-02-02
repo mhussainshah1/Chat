@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.Scanner;
 
 public class InformationDialog extends Dialog implements ActionListener, CommonSettings {
+
     private ChatClient chatClient;
     protected TextField txtUserName, txtServerName, txtServerPort, txtProxyHost, txtProxyPort;
     protected Button cmdOk, cmdCancel;
@@ -29,16 +30,16 @@ public class InformationDialog extends Dialog implements ActionListener, CommonS
     protected Checkbox isProxyCheckBox;
     protected boolean isConnect;
     private Properties properties;
-    
+
     public InformationDialog(ChatClient Parent) {
         super(Parent, PRODUCT_NAME + " - Login", true);
         chatClient = Parent;
         setFont(chatClient.getTextFont());
         setLayout(new BorderLayout());
         isConnect = false;
-        
+
         properties = this.getProperties();
-        
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -131,19 +132,19 @@ public class InformationDialog extends Dialog implements ActionListener, CommonS
         Properties propertiesLocal = new Properties();
         try {
             File x = new File("data.properties");
-            if(x.exists()){
-               InputStream inputstream = this.getClass().getResourceAsStream("data.properties");
-               //this.getClass().getClassLoader().getResourceAsStream("data.properties");
-               propertiesLocal.load(inputstream);
-               inputstream.close();
-            } else{
+            if (x.exists()) {
+                InputStream inputstream = this.getClass().getResourceAsStream("data.properties");
+                //this.getClass().getClassLoader().getResourceAsStream("data.properties");
+                propertiesLocal.load(inputstream);
+                inputstream.close();
+            } else {
                 Formatter f = new Formatter(x);
-                f.format("TurtleUserName=%s\r\n","amir");
-                f.format("TurtleServerName=%s\r\n","");
-                f.format("TurtleProxyPort=%s\r\n","");
+                f.format("TurtleUserName=%s\r\n", "amir");
+                f.format("TurtleServerName=%s\r\n", "");
+                f.format("TurtleProxyPort=%s\r\n", "");
                 f.format("TurtleServerPort=%d\r\n", PORT_NUMBER);
-                f.format("TurtleProxyHost=%s\r\n","");
-                f.format("TurtleProxyState=%s",false);
+                f.format("TurtleProxyHost=%s\r\n", "");
+                f.format("TurtleProxyState=%s", false);
                 f.close();
 
                 Scanner sc = new Scanner(x);
@@ -151,12 +152,12 @@ public class InformationDialog extends Dialog implements ActionListener, CommonS
                     System.out.println(sc.next());
                 }
                 sc.close();
-            }            
+            }
         } catch (java.io.IOException | java.lang.NullPointerException exc) {
             exc.printStackTrace();
         } finally {
             return propertiesLocal;
-        }        
+        }
     }
 
     private void setProperties(Properties properties) {
@@ -178,13 +179,14 @@ public class InformationDialog extends Dialog implements ActionListener, CommonS
         } catch (java.io.IOException exc) {
             exc.printStackTrace();
         }
-    }   
-    
+    }
+
     /**
-     * ****** Action Event Coding Starts *************
+     * ****** Action Event Coding Starts
+     *
+     *************
      * @param evt
      */
-    
     @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource().equals(cmdOk)) {

@@ -35,9 +35,9 @@ import javax.swing.JOptionPane;
 /**
  * ********Chat Client*************
  */
-public class ChatClient extends Frame implements Serializable, KeyListener, 
+public class ChatClient extends Frame implements Serializable, KeyListener,
         ActionListener, CommonSettings, Runnable {
-    
+
     public static void main(String[] args) {
         ChatClient cw = new ChatClient();
     }
@@ -73,7 +73,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     private Socket socket;
 //    private DataInputStream in;
     private BufferedReader in;
-    private DataOutputStream out;          
+    private DataOutputStream out;
 
     private Thread thread;
     private StringTokenizer tokenizer;
@@ -314,7 +314,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         disableAll();
         startFlag = false;
         setAppletStatus("ADMIN: CONNECTION TO THE SERVER CLOSED.");
-    }  
+    }
 
     /**
      * ******Implements the Thread ***************
@@ -563,8 +563,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
 //            messagebox.AddMessage("~~13 " + PRODUCT_NAME);
 //            messagebox.AddMessage("Developed By...");
 //            messagebox.AddMessage(COMPANY_NAME);
-            
-            JOptionPane.showMessageDialog(this, PRODUCT_NAME+"\n Developed By...\n"+ COMPANY_NAME ,
+
+            JOptionPane.showMessageDialog(this, PRODUCT_NAME + "\n Developed By...\n" + COMPANY_NAME,
                     "About Us", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("icons/photo13.gif"));
         }
     }
@@ -607,7 +607,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     public String getUserName() {
         return userName;
     }
-    
+
     /**
      * *******Function To Update the Information Label****
      */
@@ -670,7 +670,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
             messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
             quitConnection(QUIT_TYPE_DEFAULT);
         }
-    }    
+    }
 
     /**
      * *** Enable the Private Chat when the End User logged out***
@@ -702,7 +702,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * *****Function To Send Private Message To Server **********
      */
     protected void sentPrivateMessageToServer(String Message, String ToUserName) {
-        sendMessageToServer("PRIV " + ToUserName + "~" 
+        sendMessageToServer("PRIV " + ToUserName + "~"
                 + userName + ": " + Message);
     }
 
@@ -738,7 +738,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
             return;
         }
 
-        sendMessageToServer("CHRO " + userName + "~" 
+        sendMessageToServer("CHRO " + userName + "~"
                 + tapPanel.RoomCanvas.SelectedUser);
     }
 
@@ -756,7 +756,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         if (txtMessage.getText() == null || txtMessage.getText().equals("")) {
             txtMessage.setText("~~" + imageName + " ");
         } else {
-            txtMessage.setText(txtMessage.getText() + " " 
+            txtMessage.setText(txtMessage.getText() + " "
                     + "~~" + imageName + " ");
         }
     }
@@ -775,7 +775,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 /**
                  * *******Proxy**********
                  */
-                SocksSocketImplFactory factory 
+                SocksSocketImplFactory factory
                         = new SocksSocketImplFactory(proxyHost, proxyPort);
                 SocksSocket.setSocketImplFactory(factory);
                 socket = new SocksSocket(serverName, serverPort);
@@ -810,9 +810,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         /**
          * ******Sending a Message To Server ********
          */
-        sendMessageToServer("MESS " + userRoom + "~" + userName + ": " 
+        sendMessageToServer("MESS " + userRoom + "~" + userName + ": "
                 + txtMessage.getText());
-        messageCanvas.addMessageToMessageObject(userName + ": " 
+        messageCanvas.addMessageToMessageObject(userName + ": "
                 + txtMessage.getText(), MESSAGE_TYPE_DEFAULT);
         txtMessage.setText("");
         txtMessage.requestFocus();

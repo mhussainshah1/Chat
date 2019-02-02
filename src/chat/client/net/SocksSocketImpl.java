@@ -29,7 +29,6 @@ import java.net.SocketAddress;
  *
  *
  */
-
 /**
  * SocksSocketImpl: A Socket Implementation class support SOCKS4A & SOCKS5
  *

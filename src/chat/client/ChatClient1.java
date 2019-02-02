@@ -17,7 +17,6 @@ import java.util.StringTokenizer;
  *
  * @author m_hus
  */
-
 public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
     /**
