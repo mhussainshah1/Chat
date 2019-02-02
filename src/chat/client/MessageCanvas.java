@@ -22,8 +22,8 @@ public class MessageCanvas extends Canvas implements CommonSettings {
     Image offImage;
     Graphics offGraphics;
     ChatClient chatclient;
-    ArrayList MessageArray;
-    int G_ILoop, XOffset, YOffset, HorizantalSpace;
+    ArrayList<MessageObject> MessageArray;
+    int count, XOffset, YOffset, HorizantalSpace;
     MessageObject messageobject;
     ScrollView scrollview;
     FontMetrics fontmetrics;
@@ -40,7 +40,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
          * *** Waiting for Loading Chat	Client *********
          */
         dimension = chatclient.getSize();
-        MessageArray = new ArrayList();
+        MessageArray = new ArrayList<>();
         MessageCount = 0;
         TotalWidth = 0;
         HorizantalSpace = 2;
@@ -77,7 +77,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
     private void AddMessage(String Message, int MessageType) {
         int m_startY = DEFAULT_MESSAGE_CANVAS_POSITION;
         if (MessageArray.size() > 0) {
-            messageobject = (MessageObject) MessageArray.get(MessageArray.size() - 1);
+            messageobject = MessageArray.get(MessageArray.size() - 1);
             m_startY = messageobject.StartY + messageobject.Height;
         }
 
@@ -118,19 +118,19 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         int m_YPos = YOffset + dimension.height;
         int m_StartPos = 0;
         int m_listArraySize = MessageArray.size();
-        for (G_ILoop = 0; G_ILoop < MessageCount && m_StartPos < m_YPos; G_ILoop++) {
-            if (m_listArraySize < G_ILoop) {
+        for (count = 0; count < MessageCount && m_StartPos < m_YPos; count++) {
+            if (m_listArraySize < count) {
                 return;
             }
-            messageobject = (MessageObject) MessageArray.get(G_ILoop);
+            messageobject = MessageArray.get(count);
             if (messageobject.StartY >= YOffset) {
                 PaintMessageIntoCanvas(graphics, messageobject);
                 m_StartPos = messageobject.StartY;
             }
         }
 
-        if (G_ILoop < MessageCount) {
-            messageobject = (MessageObject) MessageArray.get(G_ILoop);
+        if (count < MessageCount) {
+            messageobject = MessageArray.get(count);
             PaintMessageIntoCanvas(graphics, messageobject);
         }
     }

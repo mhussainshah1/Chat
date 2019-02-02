@@ -19,8 +19,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
     Image offImage;
     Graphics offGraphics;
     ChatClient chatclient;
-    ArrayList IconArray;
-    int G_ILoop;
+    ArrayList<MessageObject> IconArray;
+    int count;
     int XOffset;
     int YOffset;
     MessageObject messageobject;
@@ -35,7 +35,7 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         chatclient = Parent;
         privatechat = ParentPrivate;
         dimension = size();
-        IconArray = new ArrayList();
+        IconArray = new ArrayList<>();
         setBackground(BACKGROUND);
         setFont(chatclient.getTextFont());
     }
@@ -43,16 +43,16 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
     protected void AddIconsToMessageObject() {
         int StartX = IMAGE_CANVAS_START_POSITION;
         int StartY = IMAGE_CANVAS_START_POSITION;
-        for (G_ILoop = 1; G_ILoop <= chatclient.getIconCount(); G_ILoop++) {
+        for (count = 1; count <= chatclient.getIconCount(); count++) {
             messageobject = new MessageObject();
-            messageobject.Message = (G_ILoop - 1) + "";
+            messageobject.Message = (count - 1) + "";
             messageobject.StartX = StartX;
             messageobject.StartY = StartY;
             messageobject.IsImage = true;
             messageobject.Width = DEFAULT_ICON_WIDTH;
             messageobject.Height = DEFAULT_ICON_HEIGHT;
             IconArray.add(messageobject);
-            if (G_ILoop % 6 == 0) {
+            if (count % 6 == 0) {
                 StartX = IMAGE_CANVAS_START_POSITION;
                 StartY += DEFAULT_ICON_HEIGHT + DEFAULT_IMAGE_CANVAS_SPACE;
             } else {
@@ -68,8 +68,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
 
     private void PaintFrame(Graphics graphics) {
         int m_iconListSize = IconArray.size();
-        for (G_ILoop = 0; G_ILoop < m_iconListSize; G_ILoop++) {
-            messageobject = (MessageObject) IconArray.get(G_ILoop);
+        for (count = 0; count < m_iconListSize; count++) {
+            messageobject = IconArray.get(count);
             if ((messageobject.StartY + messageobject.Height) >= YOffset) {
                 PaintImagesIntoCanvas(graphics, messageobject);
             }
@@ -113,8 +113,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
     public boolean mouseMove(Event event, int i, int j) {
         int CurrentY = j + YOffset;
         int m_iconListSize = IconArray.size();
-        for (G_ILoop = 0; G_ILoop < m_iconListSize; G_ILoop++) {
-            messageobject = (MessageObject) IconArray.get(G_ILoop);
+        for (count = 0; count < m_iconListSize; count++) {
+            messageobject = IconArray.get(count);
             if ((CurrentY <= messageobject.StartY + messageobject.Height) && (i <= messageobject.StartX + messageobject.Width)) {
                 SelectedImage = messageobject.Message;
                 repaint();
@@ -128,8 +128,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
     public boolean mouseDown(Event event, int i, int j) {
         int CurrentY = j + YOffset;
         int m_iconListSize = IconArray.size();
-        for (G_ILoop = 0; G_ILoop < m_iconListSize; G_ILoop++) {
-            messageobject = (MessageObject) IconArray.get(G_ILoop);
+        for (count = 0; count < m_iconListSize; count++) {
+            messageobject = IconArray.get(count);
             if ((CurrentY <= messageobject.StartY + messageobject.Height) && (i <= messageobject.StartX + messageobject.Width)) {
                 privatechat.addImageToTextField(messageobject.Message);
                 break;

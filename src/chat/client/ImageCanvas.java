@@ -11,29 +11,42 @@ import java.awt.Font;
 import java.awt.Cursor;
 public class ImageCanvas extends Canvas implements CommonSettings
 {
+    /***********Global Variable Declarations****************/
+    Dimension offDimension;
+    Dimension dimension;
+    Image offImage;
+    Graphics offGraphics;
+    ChatClient chatclient;
+    ArrayList<MessageObject> IconArray;
+    int count;
+    int XOffset;
+    int YOffset;
+    MessageObject messageobject;
+    ScrollView scrollview;
+    String SelectedImage;
 	/**********Constructor Of Image Canvas *************/
 	ImageCanvas(ChatClient Parent)
 	{
 		chatclient = Parent;		
 		dimension = this.getSize();
-		IconArray = new ArrayList();								
+		IconArray = new ArrayList<>();								
 	}
 	
 	protected void AddIconsToMessageObject()
 	{
 		int StartX = IMAGE_CANVAS_START_POSITION;					
 		int StartY = IMAGE_CANVAS_START_POSITION;
-		for(G_ILoop = 1; G_ILoop <= chatclient.getIconCount();G_ILoop++)
+		for(count = 1; count <= chatclient.getIconCount();count++)
 		{
 			messageobject = new MessageObject();
-			messageobject.Message = (G_ILoop - 1)+"";
+			messageobject.Message = (count - 1)+"";
 			messageobject.StartX  = StartX;
 			messageobject.StartY  = StartY;
 			messageobject.IsImage = true;
 			messageobject.Width   = DEFAULT_ICON_WIDTH;
 			messageobject.Height  = DEFAULT_ICON_HEIGHT;
 			IconArray.add(messageobject);			
-			if(G_ILoop % 3 == 0)
+			if(count % 3 == 0)
 			{
 				StartX	= IMAGE_CANVAS_START_POSITION;
 				StartY	+= DEFAULT_ICON_HEIGHT+DEFAULT_IMAGE_CANVAS_SPACE;
@@ -53,9 +66,9 @@ public class ImageCanvas extends Canvas implements CommonSettings
 	private void PaintFrame(Graphics graphics)
 	{
 		int m_iconListSize = IconArray.size();		
-		for(G_ILoop = 0; G_ILoop < m_iconListSize; G_ILoop++)
+		for(count = 0; count < m_iconListSize; count++)
 		{			
-			messageobject = (MessageObject) IconArray.get(G_ILoop);			
+			messageobject = IconArray.get(count);			
 			if((messageobject.StartY + messageobject.Height) >= YOffset)
 			{				
 				PaintImagesIntoCanvas(graphics,messageobject);	
@@ -106,9 +119,9 @@ public class ImageCanvas extends Canvas implements CommonSettings
 	{
 		int CurrentY = j + YOffset;
 		int m_iconListSize = IconArray.size();
-		for(G_ILoop = 0; G_ILoop <  m_iconListSize; G_ILoop++)
+		for(count = 0; count <  m_iconListSize; count++)
 		{
-			messageobject = (MessageObject) IconArray.get(G_ILoop);
+			messageobject = IconArray.get(count);
 			if((CurrentY <= messageobject.StartY+messageobject.Height) && (i <= messageobject.StartX+messageobject.Width))
 			{
 				SelectedImage = messageobject.Message;
@@ -124,9 +137,9 @@ public class ImageCanvas extends Canvas implements CommonSettings
 	{
 		int CurrentY = j + YOffset;
 		int m_iconListSize = IconArray.size();
-		for(G_ILoop = 0; G_ILoop <  m_iconListSize; G_ILoop++)
+		for(count = 0; count <  m_iconListSize; count++)
 		{
-			messageobject = (MessageObject) IconArray.get(G_ILoop);
+			messageobject = IconArray.get(count);
 			if((CurrentY <= messageobject.StartY+messageobject.Height) && (i <= messageobject.StartX+messageobject.Width))
 			{
 				chatclient.addImageToTextField(messageobject.Message);
@@ -165,14 +178,4 @@ public class ImageCanvas extends Canvas implements CommonSettings
 		paint(graphics);	
 	}
 	
-	/***********Global Variable Declarations****************/
-	Dimension offDimension,dimension;
-    Image offImage;
-    Graphics offGraphics;  	
-    ChatClient chatclient;    
-    ArrayList IconArray;
-    int G_ILoop,XOffset,YOffset;
-    MessageObject messageobject;
-    ScrollView scrollview;
-    String SelectedImage;
 }
