@@ -15,32 +15,33 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class PrivateChat extends Frame implements CommonSettings, KeyListener, ActionListener {
+public class PrivateChat extends Frame implements CommonSettings, KeyListener, 
+        ActionListener {
     public static void main(String[] args) {
         
     }
+    
+    private ChatClient chatClient;
+    protected String userName;
+    private TextField txtMessage;
+    private boolean emotionFlag;
 
-    private ChatClient chatclient;
-    protected String UserName;
-    private TextField TxtMessage;
-    private boolean EmotionFlag;
-
-    private Button CmdSend, CmdClose, CmdIgnore, CmdClear, CmdEmoticons;
-    private EmotionCanvas emotioncanvas;
-    private ScrollView EmotionScrollView, MessageScrollView;
+    private Button cmdSend, cmdClose, cmdIgnore, cmdClear, cmdEmoticons;
+    private EmotionCanvas emotionCanvas;
+    private ScrollView emotionScrollView, messageScrollView;
     private MessageCanvas messageCanvas;//Replace with JtextPane
-    private Panel EmotionPanel;
+    private Panel emotionPanel;
 
 
-    PrivateChat(ChatClient Parent, String ToUserName) {
-        chatclient = Parent;
-        UserName = ToUserName;
-        setTitle("Private Chat With " + UserName);
+    PrivateChat(ChatClient parent, String toUserName) {
+        chatClient = parent;
+        userName = toUserName;
+        setTitle("Private Chat With " + userName);
         Image IconImage = Toolkit.getDefaultToolkit().getImage("images/logo.gif");
         setIconImage(IconImage);
         setBackground(BACKGROUND);
-        setFont(chatclient.getFont());
-        EmotionFlag = false;
+        setFont(chatClient.getFont());
+        emotionFlag = false;
         initializeComponents();
         /**
          * **Window Closing Event ****
@@ -62,66 +63,66 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
      */
     private void initializeComponents() {
         setLayout(null);
-        Label LblConversation = new Label("Conversation With " + UserName);
+        Label LblConversation = new Label("Conversation With " + userName);
         LblConversation.setForeground(MESSAGE_CANVAS);
         LblConversation.setBounds(5, 30, 400, 20);
         add(LblConversation);
 
         Panel MessagePanel = new Panel(new BorderLayout());
-        messageCanvas = new MessageCanvas(chatclient);
-        MessageScrollView = new ScrollView(messageCanvas, true, true,
+        messageCanvas = new MessageCanvas(chatClient);
+        messageScrollView = new ScrollView(messageCanvas, true, true,
                 TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        messageCanvas.scrollview = MessageScrollView;
-        MessagePanel.add("Center", MessageScrollView);
+        messageCanvas.scrollview = messageScrollView;
+        MessagePanel.add("Center", messageScrollView);
         MessagePanel.setBounds(5, 50, 400, 200);
         add(MessagePanel);
 
-        TxtMessage = new TextField();
-        TxtMessage.addKeyListener(this);
-        TxtMessage.setFont(chatclient.getTextFont());
-        TxtMessage.setBounds(5, 260, 320, 20);
-        add(TxtMessage);
+        txtMessage = new TextField();
+        txtMessage.addKeyListener(this);
+        txtMessage.setFont(chatClient.getTextFont());
+        txtMessage.setBounds(5, 260, 320, 20);
+        add(txtMessage);
 
-        CmdSend = new CustomButton(chatclient, "Send");
-        CmdSend.addActionListener(this);
-        CmdSend.setBounds(335, 260, 70, 20);
-        add(CmdSend);
+        cmdSend = new CustomButton(chatClient, "Send");
+        cmdSend.addActionListener(this);
+        cmdSend.setBounds(335, 260, 70, 20);
+        add(cmdSend);
 
-        CmdClear = new CustomButton(chatclient, "Clear");
-        CmdClear.addActionListener(this);
-        CmdClear.setBounds(5, 290, 80, 20);
+        cmdClear = new CustomButton(chatClient, "Clear");
+        cmdClear.addActionListener(this);
+        cmdClear.setBounds(5, 290, 80, 20);
 
-        CmdIgnore = new CustomButton(chatclient, "Ignore User");
-        CmdIgnore.addActionListener(this);
-        CmdIgnore.setBounds(105, 290, 80, 20);
+        cmdIgnore = new CustomButton(chatClient, "Ignore User");
+        cmdIgnore.addActionListener(this);
+        cmdIgnore.setBounds(105, 290, 80, 20);
 
-        CmdClose = new CustomButton(chatclient, "Close");
-        CmdClose.addActionListener(this);
-        CmdClose.setBounds(205, 290, 80, 20);
+        cmdClose = new CustomButton(chatClient, "Close");
+        cmdClose.addActionListener(this);
+        cmdClose.setBounds(205, 290, 80, 20);
 
-        CmdEmoticons = new CustomButton(chatclient, "Emoticons");
-        CmdEmoticons.addActionListener(this);
-        CmdEmoticons.setBounds(305, 290, 80, 20);
+        cmdEmoticons = new CustomButton(chatClient, "Emoticons");
+        cmdEmoticons.addActionListener(this);
+        cmdEmoticons.setBounds(305, 290, 80, 20);
 
-        add(CmdClear);
-        add(CmdIgnore);
-        add(CmdClose);
-        add(CmdEmoticons);
+        add(cmdClear);
+        add(cmdIgnore);
+        add(cmdClose);
+        add(cmdEmoticons);
 
-        EmotionPanel = new Panel(new BorderLayout());
-        emotioncanvas = new EmotionCanvas(chatclient, this);
-        EmotionScrollView = new ScrollView(emotioncanvas, true, true,
+        emotionPanel = new Panel(new BorderLayout());
+        emotionCanvas = new EmotionCanvas(chatClient, this);
+        emotionScrollView = new ScrollView(emotionCanvas, true, true,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        emotioncanvas.scrollview = EmotionScrollView;
+        emotionCanvas.scrollview = emotionScrollView;
         /**
          * ********Add Icons into MessageObject ********
          */
-        emotioncanvas.AddIconsToMessageObject();
-        EmotionPanel.add("Center", EmotionScrollView);
-        EmotionPanel.setVisible(false);
-        EmotionPanel.setBounds(5, 320,
+        emotionCanvas.AddIconsToMessageObject();
+        emotionPanel.add("Center", emotionScrollView);
+        emotionPanel.setVisible(false);
+        emotionPanel.setBounds(5, 320,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT);
-        add(EmotionPanel);
+        add(emotionPanel);
 
         setSize(PRIVATE_WINDOW_WIDTH, PRIVATE_WINDOW_HEIGHT);
         setResizable(false);
@@ -134,11 +135,11 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource().equals(CmdSend)) {
+        if (evt.getSource().equals(cmdSend)) {
             /**
              * ****** Send Message ********
              */
-            if (!(TxtMessage.getText().trim().equals(""))) {
+            if (!(txtMessage.getText().trim().equals(""))) {
                 sendMessage();
             }
         }
@@ -146,43 +147,43 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
         /**
          * ***Close Button Event *******
          */
-        if (evt.getSource().equals(CmdClose)) {
+        if (evt.getSource().equals(cmdClose)) {
             exitPrivateWindow();
         }
 
         /**
          * *******Clear Button Event *******
          */
-        if (evt.getSource().equals(CmdClear)) {
+        if (evt.getSource().equals(cmdClear)) {
             messageCanvas.ClearAll();
         }
 
         /**
          * *** Ignore Action Event *******
          */
-        if (evt.getSource().equals(CmdIgnore)) {
+        if (evt.getSource().equals(cmdIgnore)) {
             if (evt.getActionCommand().equals("Ignore User")) {
-                chatclient.getTapPanel().UserCanvas.IgnoreUser(true, UserName);
-                messageCanvas.addMessageToMessageObject(UserName + " has been ignored!", MESSAGE_TYPE_ADMIN);
-                CmdIgnore.setLabel("Allow User");
+                chatClient.getTapPanel().UserCanvas.ignoreUser(true, userName);
+                messageCanvas.addMessageToMessageObject(userName + " has been ignored!", MESSAGE_TYPE_ADMIN);
+                cmdIgnore.setLabel("Allow User");
             } else {
-                messageCanvas.addMessageToMessageObject(UserName + " has been removed from ignored list!", MESSAGE_TYPE_ADMIN);
-                chatclient.getTapPanel().UserCanvas.IgnoreUser(false, UserName);
-                CmdIgnore.setLabel("Ignore User");
+                messageCanvas.addMessageToMessageObject(userName + " has been removed from ignored list!", MESSAGE_TYPE_ADMIN);
+                chatClient.getTapPanel().UserCanvas.ignoreUser(false, userName);
+                cmdIgnore.setLabel("Ignore User");
             }
         }
 
         /**
          * *** Emoticons Action Event *******
          */
-        if (evt.getSource().equals(CmdEmoticons)) {
-            if (EmotionFlag) {
-                EmotionFlag = false;
-                EmotionPanel.setVisible(false);
+        if (evt.getSource().equals(cmdEmoticons)) {
+            if (emotionFlag) {
+                emotionFlag = false;
+                emotionPanel.setVisible(false);
                 setSize(PRIVATE_WINDOW_WIDTH, PRIVATE_WINDOW_HEIGHT);
             } else {
-                EmotionFlag = true;
-                EmotionPanel.setVisible(true);
+                emotionFlag = true;
+                emotionPanel.setVisible(true);
                 setSize(PRIVATE_WINDOW_WIDTH, PRIVATE_WINDOW_HEIGHT + EMOTION_CANVAS_HEIGHT);
             }
         }
@@ -194,7 +195,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
      */
     @Override
     public void keyPressed(KeyEvent evt) {
-        if ((evt.getKeyCode() == 10) && (!(TxtMessage.getText().trim().equals("")))) {
+        if ((evt.getKeyCode() == 10) && (!(txtMessage.getText().trim().equals("")))) {
             sendMessage();
         }
     }
@@ -208,45 +209,46 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener, A
     }
 
     private void sendMessage() {
-        messageCanvas.addMessageToMessageObject(chatclient.getUserName() + ": " + TxtMessage.getText(), MESSAGE_TYPE_DEFAULT);
-        chatclient.sentPrivateMessageToServer(TxtMessage.getText(), UserName);
-        TxtMessage.setText("");
-        TxtMessage.requestFocus();
+        messageCanvas.addMessageToMessageObject(chatClient.getUserName() + ": " + txtMessage.getText(), MESSAGE_TYPE_DEFAULT);
+        chatClient.sentPrivateMessageToServer(txtMessage.getText(), userName);
+        txtMessage.setText("");
+        txtMessage.requestFocus();
     }
 
     /**
      * ****** Function to Set the Image Name into Text Field ***********
+     * @param imageName
      */
-    protected void addImageToTextField(String ImageName) {
-        if (TxtMessage.getText() == null || TxtMessage.getText().equals("")) {
-            TxtMessage.setText("~~" + ImageName + " ");
+    protected void addImageToTextField(String imageName) {
+        if (txtMessage.getText() == null || txtMessage.getText().equals("")) {
+            txtMessage.setText("~~" + imageName + " ");
         } else {
-            TxtMessage.setText(TxtMessage.getText() + " " + "~~" + ImageName + " ");
+            txtMessage.setText(txtMessage.getText() + " " + "~~" + imageName + " ");
         }
     }
 
     /**
      * *******Function to Add a Message To Messagecanvas ********
      */
-    protected void addMessageToMessageCanvas(String Message) {
-        messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_DEFAULT);
+    protected void addMessageToMessageCanvas(String message) {
+        messageCanvas.addMessageToMessageObject(message, MESSAGE_TYPE_DEFAULT);
     }
 
     protected void disableAll() {
-        TxtMessage.setEnabled(false);
-        CmdSend.setEnabled(false);
+        txtMessage.setEnabled(false);
+        cmdSend.setEnabled(false);
     }
 
     protected void enableAll() {
-        TxtMessage.setEnabled(true);
-        CmdSend.setEnabled(true);
+        txtMessage.setEnabled(true);
+        cmdSend.setEnabled(true);
     }
 
     /**
      * **** Exit from Private Chat
      */
     private void exitPrivateWindow() {
-        chatclient.removePrivateWindow(UserName);
+        chatClient.removePrivateWindow(userName);
         setVisible(false);
     }
 

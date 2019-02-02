@@ -2,10 +2,7 @@ package chat.client;
 
 import java.awt.*;
 
-public class ScrollBar extends Canvas
-        implements Runnable {
-
-
+public class ScrollBar extends Canvas implements Runnable {
     public final int HORIZONTAL = 1;
     public final int VERTICAL = 2;
     public final int MINPOS = 1;
@@ -25,6 +22,7 @@ public class ScrollBar extends Canvas
     Thread runner;
     Event lastMouseDown;
     int sleeptime;
+    
     ScrollBar(int i, Component component, int j, int k) {
         Graph = null;
         Img = null;
@@ -57,6 +55,7 @@ public class ScrollBar extends Canvas
         resize(Dim);
         validate();
     }
+    @Override
     public boolean mouseMove(Event event, int i, int j) {
         if (Disabled) {
             return true;
@@ -72,6 +71,7 @@ public class ScrollBar extends Canvas
         g.setColor(Colors[3]);
         g.drawRect(i, j, k - 1, l - 1);
     }
+    @Override
     public boolean mouseEnter(Event event, int i, int j) {
         return true;
     }
@@ -91,6 +91,7 @@ public class ScrollBar extends Canvas
             return;
         }
     }
+    @Override
     public boolean mouseExit(Event event, int i, int j) {
         return true;
     }
@@ -101,6 +102,7 @@ public class ScrollBar extends Canvas
         double d1 = (double) j * d;
         ScrollValue = (int) d1;
     }
+    @Override
     public void paint(Graphics g) {
         int i = size().width;
         int j = size().height;
@@ -166,6 +168,7 @@ public class ScrollBar extends Canvas
             LastValue = ScrollValue;
         }
     }
+    @Override
     public boolean mouseUp(Event event, int i, int j) {
         if (runner != null && running) {
             runner.stop();
@@ -206,6 +209,7 @@ public class ScrollBar extends Canvas
             Scroller.height = 8;
         }
     }
+    @Override
     public Dimension minimumSize() {
         return Dim;
     }
@@ -256,6 +260,7 @@ public class ScrollBar extends Canvas
         }
         g.fillPolygon(Xpnt, Ypnt, 3);
     }
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
@@ -332,6 +337,7 @@ public class ScrollBar extends Canvas
             runner.start();
         }
     }
+    @Override
     public void enable() {
         super.enable();
         calcValues();
@@ -444,6 +450,7 @@ public class ScrollBar extends Canvas
             LastValue = ScrollValue;
         }
     }
+    @Override
     public Dimension preferredSize() {
         return minimumSize();
     }
@@ -463,6 +470,7 @@ public class ScrollBar extends Canvas
         g.drawLine((i + k) - 1, j, (i + k) - 1, (j + l) - 1);
         g.drawLine(i, (j + l) - 1, (i + k) - 1, (j + l) - 1);
     }
+    @Override
     public boolean mouseDown(Event event, int i, int j) {
         if (Disabled) {
             return true;
@@ -496,6 +504,7 @@ public class ScrollBar extends Canvas
         }
         return true;
     }
+    @Override
     public void run() {
         do {
             try {
@@ -518,6 +527,7 @@ public class ScrollBar extends Canvas
         LineValue = k;
         repaint();
     }
+    @Override
     public boolean mouseDrag(Event event, int i, int j) {
         if (Disabled || Down) {
             return true;

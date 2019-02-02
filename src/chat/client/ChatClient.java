@@ -43,26 +43,25 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     }
 
     //Frame
-    private Image ImgLogo, ImgBanner;
+    private Image imgLogo, imgBanner;
     private Dimension dimension;
     private MediaTracker tracker;
-    private Label InformationLabel;
-    private Image[] IconArray;
+    private Label informationLabel;
+    private Image[] iconArray;
     private MessageCanvas messageCanvas;
-    private ScrollView MessageScrollView;
+    private ScrollView messageScrollView;
     private TapPanel tapPanel;
     private TextField txtMessage;
-    private Button CmdSend, CmdExit;
+    private Button cmdSend, cmdExit;
     private Font textFont;
-    protected PrivateChat[] privatewindow;
-    protected int count, iconCount, PrivateWindowCount;
+    protected PrivateChat[] privateWindows;
+    protected int count, iconCount, privateWindowCount;
     private InformationDialog dialog;
     private Toolkit toolkit;
     private MenuItem loginItem, disconnectItem, seperatorItem;
     private MenuItem quitItem, aboutItem;
     private String chatLogo, bannerName;
     private StringBuffer stringBuffer;
-    private ChatClient chatClient;
     private String appletStatus;
 
     //For future Network class 
@@ -139,28 +138,28 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
          */
         tracker = new MediaTracker(this);
         int ImageCount = 0;
-        ImgLogo = toolkit.getImage(chatLogo);
-        tracker.addImage(ImgLogo, ImageCount);
+        imgLogo = toolkit.getImage(chatLogo);
+        tracker.addImage(imgLogo, ImageCount);
         ImageCount++;
-        ImgBanner = toolkit.getImage(bannerName);
-        tracker.addImage(ImgBanner, ImageCount);
+        imgBanner = toolkit.getImage(bannerName);
+        tracker.addImage(imgBanner, ImageCount);
         ImageCount++;
 
         /**
          * ********Loading Icons....**********
          */
-        IconArray = new Image[iconCount];
+        iconArray = new Image[iconCount];
         for (count = 0; count < iconCount; count++) {
-            IconArray[count] = toolkit.getImage("icons/photo" + count + ".gif");
-            tracker.addImage(IconArray[count], ImageCount);
+            iconArray[count] = toolkit.getImage("icons/photo" + count + ".gif");
+            tracker.addImage(iconArray[count], ImageCount);
             ImageCount++;
         }
 
         /**
          * *******Initialize Private Window *********
          */
-        privatewindow = new PrivateChat[MAX_PRIVATE_WINDOW];
-        PrivateWindowCount = 0;
+        privateWindows = new PrivateChat[MAX_PRIVATE_WINDOW];
+        privateWindowCount = 0;
 
         try {
             setAppletStatus("Loading Images and Icons.....");
@@ -194,9 +193,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
          */
         Panel TopPanel = new Panel(new BorderLayout());
         TopPanel.setBackground(TOP_PANEL_BACKGROUND);
-        Panel LogoPanel = new ImagePanel(this, ImgLogo);
+        Panel LogoPanel = new ImagePanel(this, imgLogo);
         TopPanel.add("East", LogoPanel);
-        Panel BannerPanel = new ImagePanel(this, ImgBanner);
+        Panel BannerPanel = new ImagePanel(this, imgBanner);
         TopPanel.add("West", BannerPanel);
         add("North", TopPanel);
 
@@ -206,11 +205,11 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         Panel CenterPanel = new Panel(new BorderLayout());
         Panel InformationPanel = new Panel(new BorderLayout());
         InformationPanel.setBackground(INFORMATION_PANEL_BACKGROUND);
-        InformationLabel = new Label();
-        InformationLabel.setAlignment(1);
+        informationLabel = new Label();
+        informationLabel.setAlignment(1);
         updateInformationLabel();
-        InformationLabel.setForeground(LABEL_TEXT_COLOR);
-        InformationPanel.add("Center", InformationLabel);
+        informationLabel.setForeground(LABEL_TEXT_COLOR);
+        InformationPanel.add("Center", informationLabel);
         CenterPanel.add("North", InformationPanel);
 
         /**
@@ -218,9 +217,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
          */
         Panel MessagePanel = new Panel(new BorderLayout());
         messageCanvas = new MessageCanvas(this);
-        MessageScrollView = new ScrollView(messageCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        messageCanvas.scrollview = MessageScrollView;
-        MessagePanel.add("Center", MessageScrollView);
+        messageScrollView = new ScrollView(messageCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+        messageCanvas.scrollview = messageScrollView;
+        MessagePanel.add("Center", messageScrollView);
 
         tapPanel = new TapPanel(this);
 
@@ -236,17 +235,17 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         txtMessage = new TextField();
         txtMessage.addKeyListener(this);
         txtMessage.setFont(textFont);
-        CmdSend = new CustomButton(this, "Send Message!");
-        CmdSend.addActionListener(this);
+        cmdSend = new CustomButton(this, "Send Message!");
+        cmdSend.addActionListener(this);
         TextBoxPanel.add("West", LblGeneral);
         TextBoxPanel.add("Center", txtMessage);
-        TextBoxPanel.add("East", CmdSend);
+        TextBoxPanel.add("East", cmdSend);
         InputPanel.add("Center", TextBoxPanel);
 
         Panel InputButtonPanel = new Panel(new BorderLayout());
-        CmdExit = new CustomButton(this, "Exit Chat");
-        CmdExit.addActionListener(this);
-        InputButtonPanel.add("Center", CmdExit);
+        cmdExit = new CustomButton(this, "Exit Chat");
+        cmdExit.addActionListener(this);
+        InputButtonPanel.add("Center", cmdExit);
         InputPanel.add("East", InputButtonPanel);
 
         Panel EmptyPanel = new Panel();
@@ -302,7 +301,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 }
                 socket.close();
                 socket = null;
-                tapPanel.UserCanvas.ClearAll();
+                tapPanel.UserCanvas.clearAll();
             } catch (IOException ie) {
                 ie.printStackTrace();
             }
@@ -337,9 +336,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.UserCanvas.ClearAll();
+                    tapPanel.UserCanvas.clearAll();
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.UserCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.UserCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
                     messageCanvas.ClearAll();
@@ -360,10 +359,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.RoomCanvas.ClearAll();
-                    tapPanel.RoomCanvas.AddListItemToMessageObject(userRoom);
+                    tapPanel.RoomCanvas.clearAll();
+                    tapPanel.RoomCanvas.addListItemToMessageObject(userRoom);
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.RoomCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.RoomCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
                 }
 
@@ -382,7 +381,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                      */
                     splitString = serverData.substring(5);
                     enablePrivateWindow(splitString);
-                    tapPanel.UserCanvas.AddListItemToMessageObject(splitString);
+                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
@@ -401,7 +400,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 if (serverData.startsWith("REMO")) {
                     splitString = serverData.substring(5);
 
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 
@@ -420,7 +419,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ** Chk whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.IsIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                    if (!(tapPanel.UserCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
                         messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
                 }
@@ -439,7 +438,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("INKI")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 
@@ -462,7 +461,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("JORO")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.AddListItemToMessageObject(splitString);
+                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
                     /**
                      * ***Update the Information Label *******
                      */
@@ -477,7 +476,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("LERO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 
                     /**
@@ -503,26 +502,26 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.IsIgnoredUser(splitString))) {
+                    if (!(tapPanel.UserCanvas.isIgnoredUser(splitString))) {
                         boolean PrivateFlag = false;
-                        for (count = 0; count < PrivateWindowCount; count++) {
-                            if (privatewindow[count].UserName.equals(splitString)) {
-                                privatewindow[count].addMessageToMessageCanvas(serverData.substring(5));
-                                privatewindow[count].setVisible(true);
-                                privatewindow[count].requestFocus();
+                        for (count = 0; count < privateWindowCount; count++) {
+                            if (privateWindows[count].userName.equals(splitString)) {
+                                privateWindows[count].addMessageToMessageCanvas(serverData.substring(5));
+                                privateWindows[count].setVisible(true);
+                                privateWindows[count].requestFocus();
                                 PrivateFlag = true;
                                 break;
                             }
                         }
 
                         if (!(PrivateFlag)) {
-                            if (PrivateWindowCount >= MAX_PRIVATE_WINDOW) {
+                            if (privateWindowCount >= MAX_PRIVATE_WINDOW) {
                                 messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
                             } else {
-                                privatewindow[PrivateWindowCount++] = new PrivateChat(this, splitString);
-                                privatewindow[PrivateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
-                                privatewindow[PrivateWindowCount - 1].setVisible(true);
-                                privatewindow[PrivateWindowCount - 1].requestFocus();
+                                privateWindows[privateWindowCount++] = new PrivateChat(this, splitString);
+                                privateWindows[privateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
+                                privateWindows[privateWindowCount - 1].setVisible(true);
+                                privateWindows[privateWindowCount - 1].requestFocus();
                             }
                         }
                     }
@@ -540,13 +539,13 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource().equals(CmdSend)) {
+        if (evt.getSource().equals(cmdSend)) {
             if (!(txtMessage.getText().trim().equals(""))) {
                 sendMessage();
             }
         }
 
-        if ((evt.getSource().equals(CmdExit)) || (evt.getSource().equals(quitItem))) {
+        if ((evt.getSource().equals(cmdExit)) || (evt.getSource().equals(quitItem))) {
             disconnectChat();
             System.exit(0);
         }
@@ -622,7 +621,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         stringBuffer.append("No. Of Users: ");
         stringBuffer.append(totalUserCount);
         stringBuffer.append("       ");
-        InformationLabel.setText(stringBuffer.toString());
+        informationLabel.setText(stringBuffer.toString());
     }
 
     public MessageCanvas getMessageCanvas() {
@@ -634,7 +633,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     }
 
     public Image getIcon(int index) {
-        return IconArray[index];
+        return iconArray[index];
     }
 
     /**
@@ -642,7 +641,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      */
     private void disableAll() {
         txtMessage.setEnabled(false);
-        CmdSend.setEnabled(false);
+        cmdSend.setEnabled(false);
         tapPanel.setEnabled(false);
         disconnectItem.setEnabled(false);
         loginItem.setEnabled(true);
@@ -656,7 +655,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      */
     private void enableAll() {
         txtMessage.setEnabled(true);
-        CmdSend.setEnabled(true);
+        cmdSend.setEnabled(true);
         tapPanel.setEnabled(true);
         disconnectItem.setEnabled(true);
         loginItem.setEnabled(false);
@@ -676,10 +675,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * *** Enable the Private Chat when the End User logged out***
      */
     private void enablePrivateWindow(String ToUserName) {
-        for (count = 0; count < PrivateWindowCount; count++) {
-            if (privatewindow[count].UserName.equals(ToUserName)) {
-                privatewindow[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
-                privatewindow[count].enableAll();
+        for (count = 0; count < privateWindowCount; count++) {
+            if (privateWindows[count].userName.equals(ToUserName)) {
+                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].enableAll();
                 return;
             }
         }
@@ -689,10 +688,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * *** Disable the Private Chat when the End User logged out***
      */
     private void removeUserFromPrivateChat(String ToUserName) {
-        for (count = 0; count < PrivateWindowCount; count++) {
-            if (privatewindow[count].UserName.equals(ToUserName)) {
-                privatewindow[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
-                privatewindow[count].disableAll();
+        for (count = 0; count < privateWindowCount; count++) {
+            if (privateWindows[count].userName.equals(ToUserName)) {
+                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].disableAll();
                 return;
             }
         }
@@ -711,35 +710,35 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      */
     protected void removePrivateWindow(String ToUserName) {
         int m_UserIndex = 0;
-        for (count = 0; count < PrivateWindowCount; count++) {
+        for (count = 0; count < privateWindowCount; count++) {
             m_UserIndex++;
-            if (privatewindow[count].UserName.equals(ToUserName)) {
+            if (privateWindows[count].userName.equals(ToUserName)) {
                 break;
             }
         }
-        for (int m_iLoop = m_UserIndex; m_iLoop < PrivateWindowCount; m_iLoop++) {
-            privatewindow[m_iLoop] = privatewindow[m_iLoop + 1];
+        for (int m_iLoop = m_UserIndex; m_iLoop < privateWindowCount; m_iLoop++) {
+            privateWindows[m_iLoop] = privateWindows[m_iLoop + 1];
         }
 
-        PrivateWindowCount--;
+        privateWindowCount--;
     }
 
     /**
      * ******* Function to Change Room ******
      */
     protected void changeRoom() {
-        if (tapPanel.RoomCanvas.SelectedUser.equals("")) {
+        if (tapPanel.RoomCanvas.selectedUser.equals("")) {
             messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        if (tapPanel.RoomCanvas.SelectedUser.equals(userRoom)) {
+        if (tapPanel.RoomCanvas.selectedUser.equals(userRoom)) {
             messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
         sendMessageToServer("CHRO " + userName + "~"
-                + tapPanel.RoomCanvas.SelectedUser);
+                + tapPanel.RoomCanvas.selectedUser);
     }
 
     /**

@@ -29,7 +29,7 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
         UserCanvas = new ListViewCanvas(chatclient, USER_CANVAS);
 
         UserScrollView = new ScrollView(UserCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        UserCanvas.scrollview = UserScrollView;
+        UserCanvas.scrollView = UserScrollView;
         UserPanel.add("Center", UserScrollView);
 
         Panel UserButtonPanel = new Panel(new BorderLayout());
@@ -48,7 +48,7 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
         RoomCanvas = new ListViewCanvas(chatclient, ROOM_CANVAS);
 
         RoomScrollView = new ScrollView(RoomCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        RoomCanvas.scrollview = RoomScrollView;
+        RoomCanvas.scrollView = RoomScrollView;
         RoomPanel.add("Center", RoomScrollView);
 
         Panel RoomButtonPanel = new Panel(new BorderLayout());

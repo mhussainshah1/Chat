@@ -397,7 +397,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                 }
                 socket.close();
                 socket = null;
-                tappanel.UserCanvas.ClearAll();
+                tappanel.UserCanvas.clearAll();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -478,7 +478,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                         */
 //                        tappanel.userCanvas.clearAll();
 //                        while (tokenizer.hasMoreTokens()) {
-//                            tappanel.userCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+//                            tappanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
 //                        }
 //                        messageCanvas.clearAll();
 //                        messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
@@ -497,9 +497,9 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                         * ********Add User Item into User Canvas ********
 //                         */
 //                        tappanel.roomCanvas.clearAll();
-//                        tappanel.roomCanvas.AddListItemToMessageObject(userRoom);
+//                        tappanel.roomCanvas.addListItemToMessageObject(userRoom);
 //                        while (tokenizer.hasMoreTokens()) {
-//                            tappanel.roomCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+//                            tappanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
 //                        }
 //                        break;
 //                    /**
@@ -517,7 +517,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                         */
 //                        splitString = serverData.substring(5);
 //                        enablePrivateWindow(splitString);
-//                        tappanel.userCanvas.AddListItemToMessageObject(splitString);
+//                        tappanel.userCanvas.addListItemToMessageObject(splitString);
 //                        messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
 //                        break;
 //                    /**
@@ -534,7 +534,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                    case "REMO":
 //                        splitString = serverData.substring(5);
 //
-//                        tappanel.userCanvas.RemoveListItem(splitString);
+//                        tappanel.userCanvas.removeListItem(splitString);
 //                        removeUserFromPrivateChat(splitString);
 //                        messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 //
@@ -551,7 +551,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                        /**
 //                         * ** Chk whether ignored user ********
 //                         */
-//                        if (!(tappanel.userCanvas.IsIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+//                        if (!(tappanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
 //                            messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
 //                        }
 //                        break;
@@ -568,7 +568,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                     */
 //                    case "INKI":
 //                        splitString = serverData.substring(5);
-//                        tappanel.userCanvas.RemoveListItem(splitString);
+//                        tappanel.userCanvas.removeListItem(splitString);
 //                        removeUserFromPrivateChat(splitString);
 //                        messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 //
@@ -589,7 +589,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                     */
 //                    case "JORO":
 //                        splitString = serverData.substring(5);
-//                        tappanel.userCanvas.AddListItemToMessageObject(splitString);
+//                        tappanel.userCanvas.addListItemToMessageObject(splitString);
 //                        /**
 //                         * Update the Information Label
 //                         */
@@ -603,7 +603,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                     */
 //                    case "LERO":
 //                        splitString = serverData.substring(5, serverData.indexOf("~"));
-//                        tappanel.userCanvas.RemoveListItem(splitString);
+//                        tappanel.userCanvas.removeListItem(splitString);
 //                        messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 //
 //                        /*
@@ -627,7 +627,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 //                        /**
 //                         * Check whether ignored user
 //                         */
-//                        if (!(tappanel.userCanvas.IsIgnoredUser(splitString))) {
+//                        if (!(tappanel.userCanvas.isIgnoredUser(splitString))) {
 //                            boolean PrivateFlag = false;
 //
 //                            for (g_ILoop = 0; g_ILoop < privateWindowCount; g_ILoop++) {

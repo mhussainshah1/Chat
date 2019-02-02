@@ -476,9 +476,9 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.UserCanvas.ClearAll();
+                    tapPanel.UserCanvas.clearAll();
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.UserCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.UserCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
                     messageCanvas.ClearAll();
@@ -499,10 +499,10 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.RoomCanvas.ClearAll();
-                    tapPanel.RoomCanvas.AddListItemToMessageObject(userRoom);
+                    tapPanel.RoomCanvas.clearAll();
+                    tapPanel.RoomCanvas.addListItemToMessageObject(userRoom);
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.RoomCanvas.AddListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.RoomCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
                 }
 
@@ -521,7 +521,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                      */
                     splitString = serverData.substring(5);
                     enablePrivateWindow(splitString);
-                    tapPanel.UserCanvas.AddListItemToMessageObject(splitString);
+                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
                     messageCanvas.AddMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
@@ -540,7 +540,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                 if (serverData.startsWith("REMO")) {
                     splitString = serverData.substring(5);
 
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.AddMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 
@@ -559,7 +559,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                     /**
                      * ** Chk whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.IsIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                    if (!(tapPanel.UserCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
                         messageCanvas.AddMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
                 }
@@ -578,7 +578,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                  */
                 if (serverData.startsWith("INKI")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.AddMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 
@@ -601,7 +601,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                  */
                 if (serverData.startsWith("JORO")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.AddListItemToMessageObject(splitString);
+                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
                     /**
                      * ***Update the Information Label *******
                      */
@@ -616,7 +616,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                  */
                 if (serverData.startsWith("LERO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.UserCanvas.RemoveListItem(splitString);
+                    tapPanel.UserCanvas.removeListItem(splitString);
                     messageCanvas.AddMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 
                     /**
@@ -642,10 +642,10 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                     /**
                      * ** Chk whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.IsIgnoredUser(splitString))) {
+                    if (!(tapPanel.UserCanvas.isIgnoredUser(splitString))) {
                         boolean PrivateFlag = false;
                         for (count = 0; count < PrivateWindowCount; count++) {
-                            if (privatewindow[count].UserName.equals(splitString)) {
+                            if (privatewindow[count].userName.equals(splitString)) {
                                 privatewindow[count].addMessageToMessageCanvas(serverData.substring(5));
                                 privatewindow[count].setVisible(true);
                                 privatewindow[count].requestFocus();
@@ -680,7 +680,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
      */
     private void enablePrivateWindow(String ToUserName) {
         for (count = 0; count < PrivateWindowCount; count++) {
-            if (privatewindow[count].UserName.equals(ToUserName)) {
+            if (privatewindow[count].userName.equals(ToUserName)) {
                 privatewindow[count].getMessageCanvas().AddMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
                 privatewindow[count].enableAll();
                 return;
@@ -693,7 +693,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
      */
     private void removeUserFromPrivateChat(String ToUserName) {
         for (count = 0; count < PrivateWindowCount; count++) {
-            if (privatewindow[count].UserName.equals(ToUserName)) {
+            if (privatewindow[count].userName.equals(ToUserName)) {
                 privatewindow[count].getMessageCanvas().AddMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
                 privatewindow[count].disableAll();
                 return;
@@ -715,7 +715,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
         int m_UserIndex = 0;
         for (count = 0; count < PrivateWindowCount; count++) {
             m_UserIndex++;
-            if (privatewindow[count].UserName.equals(ToUserName)) {
+            if (privatewindow[count].userName.equals(ToUserName)) {
                 break;
             }
         }
@@ -730,17 +730,17 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
      * ******* Function to Change Room ******
      */
     protected void changeRoom() {
-        if (tapPanel.RoomCanvas.SelectedUser.equals("")) {
+        if (tapPanel.RoomCanvas.selectedUser.equals("")) {
             messageCanvas.AddMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        if (tapPanel.RoomCanvas.SelectedUser.equals(userRoom)) {
+        if (tapPanel.RoomCanvas.selectedUser.equals(userRoom)) {
             messageCanvas.AddMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        sendMessageToServer("CHRO " + userName + "~" + tapPanel.RoomCanvas.SelectedUser);
+        sendMessageToServer("CHRO " + userName + "~" + tapPanel.RoomCanvas.selectedUser);
     }
 
     /**
@@ -775,7 +775,7 @@ public class ChatClientOld extends Frame implements Serializable, Runnable, KeyL
                 }
                 socket.close();
                 socket = null;
-                tapPanel.UserCanvas.ClearAll();
+                tapPanel.UserCanvas.clearAll();
             } catch (IOException ie) {
                 ie.printStackTrace();
             }
