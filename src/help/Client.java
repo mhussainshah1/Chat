@@ -76,7 +76,7 @@ class ReceivedMessagesHandler implements Runnable {
                 tmp = tmp.substring(1, tmp.length() - 1);
                 System.out.println(
                         "\nUSERS LIST: "
-                        + new ArrayList<String>(Arrays.asList(tmp.split(","))) + "\n"
+                        + new ArrayList<>(Arrays.asList(tmp.split(","))) + "\n"
                 );
             } else {
                 try {
