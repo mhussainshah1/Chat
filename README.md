@@ -10,14 +10,16 @@ This Java Chat Application developed by my own interest, and now i am interested
 	* Java Run Time Environment 8 or Higer
 
 ### RFC Used In Chat
-HELO - Initialize Connection To Server
-QUIT - Remove Users From Chat
-KICK - Kickoff From Chat
-CHRO - Change Room
-MESS - Send General Message 
-PRIV - Send Private Message
-ROCO - Get Users Count in Specfied Room
-CALL - Request for Voice Chat (Not Included with this one)
+|RFC |			Description				|
+|----|:--------------------------------------------------------:|
+|HELO| - Initialize Connection To Server 			|
+|QUIT| - Remove Users From Chat					|
+|KICK| - Kickoff From Chat					|
+|CHRO| - Change Room						|
+|MESS| - Send General Message 					|
+|PRIV| - Send Private Message					|
+|ROCO| - Get Users Count in Specfied Room			|
+|CALL| - Request for Voice Chat (Not Included with this one)	|
 
 ### How To Run Application
 
