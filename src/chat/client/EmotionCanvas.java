@@ -14,38 +14,38 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
     Dimension offDimension, dimension;
     Image offImage;
     Graphics offGraphics;
-    ChatClient chatclient;
-    ArrayList<MessageObject> IconArray;
-    int count, XOffset, YOffset;
-    MessageObject messageobject;
-    ScrollView scrollview;
-    String SelectedImage;
-    PrivateChat privatechat;
+    ChatClient chatClient;
+    ArrayList<MessageObject> iconArray;
+    int count, xOffset, yOffset;
+    MessageObject messageObject;
+    ScrollView scrollView;
+    String selectedImage;
+    PrivateChat privateChat;
 
     /**
      * ********Constructor Of Image Canvas ************
      */
-    EmotionCanvas(ChatClient Parent, PrivateChat ParentPrivate) {
-        chatclient = Parent;
-        privatechat = ParentPrivate;
-        dimension = size();
-        IconArray = new ArrayList<>();
+    EmotionCanvas(ChatClient parent, PrivateChat parentPrivate) {
+        chatClient = parent;
+        privateChat = parentPrivate;
+        dimension = getSize();//size();
+        iconArray = new ArrayList<>();
         setBackground(BACKGROUND);
-        setFont(chatclient.getTextFont());
+        setFont(chatClient.getTextFont());
     }
 
-    protected void AddIconsToMessageObject() {
+    protected void addIconsToMessageObject() {
         int StartX = IMAGE_CANVAS_START_POSITION;
         int StartY = IMAGE_CANVAS_START_POSITION;
-        for (count = 1; count <= chatclient.getIconCount(); count++) {
-            messageobject = new MessageObject();
-            messageobject.message = (count - 1) + "";
-            messageobject.startX = StartX;
-            messageobject.startY = StartY;
-            messageobject.isImage = true;
-            messageobject.width = DEFAULT_ICON_WIDTH;
-            messageobject.height = DEFAULT_ICON_HEIGHT;
-            IconArray.add(messageobject);
+        for (count = 1; count <= chatClient.getIconCount(); count++) {
+            messageObject = new MessageObject();
+            messageObject.message = (count - 1) + "";
+            messageObject.startX = StartX;
+            messageObject.startY = StartY;
+            messageObject.isImage = true;
+            messageObject.width = DEFAULT_ICON_WIDTH;
+            messageObject.height = DEFAULT_ICON_HEIGHT;
+            iconArray.add(messageObject);
             if (count % 6 == 0) {
                 StartX = IMAGE_CANVAS_START_POSITION;
                 StartY += DEFAULT_ICON_HEIGHT + DEFAULT_IMAGE_CANVAS_SPACE;
@@ -54,38 +54,39 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
             }
         }
 
-        scrollview.setValues(dimension.width, StartY);
-        scrollview.setScrollPos(1, 1);
-        scrollview.setScrollSteps(2, 1, DEFAULT_SCROLLING_HEIGHT);
+        scrollView.setValues(dimension.width, StartY);
+        scrollView.setScrollPos(1, 1);
+        scrollView.setScrollSteps(2, 1, DEFAULT_SCROLLING_HEIGHT);
         repaint();
     }
 
-    private void PaintFrame(Graphics graphics) {
-        int m_iconListSize = IconArray.size();
+    private void paintFrame(Graphics graphics) {
+        int m_iconListSize = iconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((messageobject.startY + messageobject.height) >= YOffset) {
-                PaintImagesIntoCanvas(graphics, messageobject);
+            messageObject = iconArray.get(count);
+            if ((messageObject.startY + messageObject.height) >= yOffset) {
+                paintImagesIntoCanvas(graphics, messageObject);
             }
         }
     }
 
-    private void PaintImagesIntoCanvas(Graphics graphics, MessageObject messageObject) {
-        int m_StartY = messageObject.startY - YOffset;
-        if (messageobject.message.equals(SelectedImage)) {
+    private void paintImagesIntoCanvas(Graphics graphics, MessageObject messageObject) {
+        int m_StartY = messageObject.startY - yOffset;
+        if (this.messageObject.message.equals(selectedImage)) {
             graphics.draw3DRect(messageObject.startX - 2, m_StartY - 2, DEFAULT_ICON_WIDTH + 2, DEFAULT_ICON_HEIGHT + 2, true);
         }
-        graphics.drawImage(chatclient.getIcon(Integer.parseInt(messageObject.message)), messageObject.startX, m_StartY, DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT, this);
+        graphics.drawImage(chatClient.getIcon(Integer.parseInt(messageObject.message)), messageObject.startX, m_StartY, DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT, this);
         graphics.setColor(Color.black);
         graphics.drawString(ICON_NAME + messageObject.message, messageObject.startX - 1, m_StartY + DEFAULT_ICON_HEIGHT + 10);
     }
 
+    @Override
     public boolean handleEvent(Event event) {
-        if (event.id == 1001 && event.arg == scrollview) {
+        if (event.id == 1001 && event.arg == scrollView) {
             if (event.modifiers == 1) {
-                XOffset = event.key;
+                xOffset = event.key;
             } else {
-                YOffset = event.key;
+                yOffset = event.key;
             }
             repaint();
             return true;
@@ -94,44 +95,49 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         }
     }
 
+    @Override
     public boolean mouseEnter(Event event, int i, int j) {
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         return true;
     }
 
+    @Override
     public boolean mouseExit(Event event, int i, int j) {
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         return true;
     }
 
+    @Override
     public boolean mouseMove(Event event, int i, int j) {
-        int CurrentY = j + YOffset;
-        int m_iconListSize = IconArray.size();
+        int CurrentY = j + yOffset;
+        int m_iconListSize = iconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
-                SelectedImage = messageobject.message;
+            messageObject = iconArray.get(count);
+            if ((CurrentY <= messageObject.startY + messageObject.height) && (i <= messageObject.startX + messageObject.width)) {
+                selectedImage = messageObject.message;
                 repaint();
                 break;
             }
-            SelectedImage = null;
+            selectedImage = null;
         }
         return true;
     }
 
+    @Override
     public boolean mouseDown(Event event, int i, int j) {
-        int CurrentY = j + YOffset;
-        int m_iconListSize = IconArray.size();
+        int CurrentY = j + yOffset;
+        int m_iconListSize = iconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
-                privatechat.addImageToTextField(messageobject.message);
+            messageObject = iconArray.get(count);
+            if ((CurrentY <= messageObject.startY + messageObject.height) && (i <= messageObject.startX + messageObject.width)) {
+                privateChat.addImageToTextField(messageObject.message);
                 break;
             }
         }
         return true;
     }
 
+    @Override
     public void paint(Graphics graphics) {
         /**
          * ***********Double Buffering*************
@@ -156,7 +162,7 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         /**
          * ************* Paint the frame into the image****************
          */
-        PaintFrame(offGraphics);
+        paintFrame(offGraphics);
 
         /**
          * **************** Paint the image onto the screen************
@@ -164,6 +170,7 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         graphics.drawImage(offImage, 0, 0, null);
     }
 
+    @Override
     public void update(Graphics graphics) {
         paint(graphics);
     }

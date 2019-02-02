@@ -113,11 +113,11 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
         emotionCanvas = new EmotionCanvas(chatClient, this);
         emotionScrollView = new ScrollView(emotionCanvas, true, true,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        emotionCanvas.scrollview = emotionScrollView;
+        emotionCanvas.scrollView = emotionScrollView;
         /**
          * ********Add Icons into MessageObject ********
          */
-        emotionCanvas.AddIconsToMessageObject();
+        emotionCanvas.addIconsToMessageObject();
         emotionPanel.add("Center", emotionScrollView);
         emotionPanel.setVisible(false);
         emotionPanel.setBounds(5, 320,

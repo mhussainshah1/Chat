@@ -7,9 +7,9 @@ import java.awt.Frame;
 
 class CustomButton extends Button {
 
-    private Frame chatclient;
+    private Frame chatClient;
     public CustomButton(Frame parent, String label) {
-        chatclient = parent;
+        chatClient = parent;
         setLabel(label);
         setBackground(BUTTON_BACKGROUND);
         setForeground(BUTTON_FOREGROUND);
