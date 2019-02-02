@@ -5,28 +5,26 @@ import java.util.Vector;
 
 public class BorderPanel extends Panel {
 
-
-    public Vector tabNames;
-    public Vector tabPos;
-    public Vector cardNames;
+    public Vector<String> tabNames, cardNames;
+    public Vector<Rectangle> tabPos;
     public Panel cardPanel;
     public CardLayout cardLayout;
-    public int xofs;
+    public int xofs, curTab;
     public Font textFont;
-    public int curTab;
     Dimension dim;
     Border Tabs;
     TapPanel Cframe;
     ChatClient chatclient;
+
     public BorderPanel(TapPanel tappanel, ChatClient app, CardLayout cardlayout, Panel panel, int i, int j) {
         xofs = 0;
         curTab = 0;
         Cframe = tappanel;
         cardLayout = cardlayout;
         cardPanel = panel;
-        tabNames = new Vector(10, 5);
-        tabPos = new Vector(10, 5);
-        cardNames = new Vector(10, 5);
+        tabNames = new Vector<>(10, 5);
+        tabPos = new Vector<>(10, 5);
+        cardNames = new Vector<>(10, 5);
         textFont = new Font("Helvetica", 1, 11);
         setBackground(Color.white);
         GridBagLayout gridbaglayout = new GridBagLayout();
@@ -67,9 +65,11 @@ public class BorderPanel extends Panel {
         add(border2);
         validate();
     }
+
     public void setTab(int i) {
         Tabs.setTab(i);
     }
+
     public int addTab(String s, String s1) {
         tabNames.addElement(s);
         cardNames.addElement(s1);

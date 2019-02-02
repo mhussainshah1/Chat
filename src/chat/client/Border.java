@@ -112,7 +112,7 @@ public class Border extends Canvas implements CommonSettings {
 
     public void setTab(int i) {
         parent.curTab = i;
-        String s = (String) parent.cardNames.elementAt(i);
+        String s = parent.cardNames.elementAt(i);
         parent.cardLayout.show(parent.cardPanel, s);
         repaint();
     }
@@ -179,7 +179,7 @@ public class Border extends Canvas implements CommonSettings {
             return true;
         }
         for (int k = 0; k < parent.tabPos.size(); k++) {
-            Rectangle rectangle = (Rectangle) parent.tabPos.elementAt(k);
+            Rectangle rectangle = parent.tabPos.elementAt(k);
             if (rectangle.inside(i, j)) {
                 setTab(k);
             }
@@ -223,7 +223,7 @@ public class Border extends Canvas implements CommonSettings {
         g.drawLine(i - 1, l, i - 1, k + 1);
         parent.tabPos.removeAllElements();
         for (int j1 = 0; j1 < parent.tabNames.size(); j1++) {
-            String s = (String) parent.tabNames.elementAt(j1);
+            String s = parent.tabNames.elementAt(j1);
             Rectangle rectangle1 = new Rectangle();
             int j = fontmetrics.stringWidth(s);
             rectangle1.x = i1;
@@ -235,8 +235,8 @@ public class Border extends Canvas implements CommonSettings {
             i1 += rectangle1.width;
         }
 
-        Rectangle rectangle = (Rectangle) parent.tabPos.elementAt(parent.curTab);
-        drawTab(g, rectangle.x, rectangle.y - 4, rectangle.width + 2, rectangle.height + 5, true, (String) parent.tabNames.elementAt(parent.curTab));
+        Rectangle rectangle = parent.tabPos.elementAt(parent.curTab);
+        drawTab(g, rectangle.x, rectangle.y - 4, rectangle.width + 2, rectangle.height + 5, true, parent.tabNames.elementAt(parent.curTab));
     }
 
     public void drawHorizontal(Graphics g) {
