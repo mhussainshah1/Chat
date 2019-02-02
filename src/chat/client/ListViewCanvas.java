@@ -43,15 +43,15 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int m_startY = DEFAULT_LIST_CANVAS_POSITION;
         if (ListArray.size() > 0) {
             messageobject = ListArray.get(ListArray.size() - 1);
-            m_startY = messageobject.StartY + DEFAULT_LIST_CANVAS_INCREMENT;
+            m_startY = messageobject.startY + DEFAULT_LIST_CANVAS_INCREMENT;
         }
         messageobject = new MessageObject();
-        messageobject.Message = ListItem;
-        messageobject.StartY = m_startY;
-        messageobject.Selected = false;
-        messageobject.Width = fontmetrics.stringWidth(ListItem) + DEFAULT_LIST_CANVAS_INCREMENT;
+        messageobject.message = ListItem;
+        messageobject.startY = m_startY;
+        messageobject.selected = false;
+        messageobject.width = fontmetrics.stringWidth(ListItem) + DEFAULT_LIST_CANVAS_INCREMENT;
         ListArray.add(messageobject);
-        TotalWidth = Math.max(TotalWidth, messageobject.Width);
+        TotalWidth = Math.max(TotalWidth, messageobject.width);
         scrollview.setValues(TotalWidth, m_startY + DEFAULT_LIST_CANVAS_HEIGHT);
         scrollview.setScrollPos(1, 1);
         scrollview.setScrollSteps(2, 1, DEFAULT_SCROLLING_HEIGHT);
@@ -69,13 +69,13 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
     }
 
     /**
-     * *****Function To Get the Index of Give Message from List Array ********
+     * ******Function To Get the Index of Give message from List Array ********
      */
     private int GetIndexOf(String Message) {
         int m_listSize = ListArray.size();
         for (count = 0; count < m_listSize; count++) {
             messageobject = ListArray.get(count);
-            if (messageobject.Message.equals(Message)) {
+            if (messageobject.message.equals(Message)) {
                 return count;
             }
         }
@@ -88,7 +88,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int m_listIndex = GetIndexOf(IgnoreUserName);
         if (m_listIndex >= 0) {
             messageobject = ListArray.get(m_listIndex);
-            messageobject.IsIgnored = IsIgnore;
+            messageobject.isIgnored = IsIgnore;
             ListArray.set(m_listIndex, messageobject);
 
             if (IsIgnore) {
@@ -138,7 +138,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int m_listIndex = GetIndexOf(UserName);
         if (m_listIndex >= 0) {
             messageobject = ListArray.get(m_listIndex);
-            return messageobject.IsIgnored;
+            return messageobject.isIgnored;
         }
 
         /**
@@ -155,14 +155,14 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int ListIndex = GetIndexOf(ListItem);
         if (ListIndex >= 0) {
             messageobject = ListArray.get(ListIndex);
-            int m_StartY = messageobject.StartY;
+            int m_StartY = messageobject.startY;
             ListArray.remove(ListIndex);
             int m_listSize = ListArray.size();
             int m_nextStartY;
             for (count = ListIndex; count < m_listSize; count++) {
                 messageobject = ListArray.get(count);
-                m_nextStartY = messageobject.StartY;
-                messageobject.StartY = m_StartY;
+                m_nextStartY = messageobject.startY;
+                messageobject.startY = m_StartY;
                 m_StartY = m_nextStartY;
             }
 
@@ -174,18 +174,18 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int m_listArraySize = ListArray.size();
         for (count = 0; count < m_listArraySize; count++) {
             messageobject = ListArray.get(count);
-            if ((messageobject.StartY + messageobject.Height) >= YOffset) {
+            if ((messageobject.startY + messageobject.height) >= YOffset) {
                 PaintListItemIntoCanvas(graphics, messageobject);
             }
         }
     }
 
     private void PaintListItemIntoCanvas(Graphics graphics, MessageObject messageObject) {
-        int m_StartY = messageObject.StartY - YOffset;
+        int m_StartY = messageObject.startY - YOffset;
         int m_imageIndex = ROOM_CANVAS_ICON;
         switch (CanvasType) {
             case USER_CANVAS: {
-                if (messageobject.IsIgnored == true) {
+                if (messageobject.isIgnored == true) {
                     m_imageIndex = USER_CANVAS_IGNORE_ICON;
                 } else {
                     m_imageIndex = USER_CANVAS_NORMAL_ICON;
@@ -194,16 +194,16 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
             }
         }
         graphics.drawImage(chatclient.getIcon(m_imageIndex), 5 - XOffset, m_StartY, DEFAULT_LIST_CANVAS_HEIGHT, DEFAULT_LIST_CANVAS_HEIGHT, this);
-        if (messageobject.Selected) {
+        if (messageobject.selected) {
             graphics.setColor(Color.blue);
             graphics.fillRect(5 - XOffset + DEFAULT_LIST_CANVAS_HEIGHT, m_StartY, TotalWidth, DEFAULT_LIST_CANVAS_INCREMENT);
             graphics.setColor(Color.white);
-            graphics.drawString(messageObject.Message, 5 - XOffset + DEFAULT_LIST_CANVAS_INCREMENT, m_StartY + DEFAULT_LIST_CANVAS_HEIGHT);
+            graphics.drawString(messageObject.message, 5 - XOffset + DEFAULT_LIST_CANVAS_INCREMENT, m_StartY + DEFAULT_LIST_CANVAS_HEIGHT);
         } else {
             graphics.setColor(Color.white);
             graphics.fillRect(5 - XOffset + DEFAULT_LIST_CANVAS_HEIGHT, m_StartY, TotalWidth, DEFAULT_LIST_CANVAS_INCREMENT);
             graphics.setColor(Color.black);
-            graphics.drawString(messageObject.Message, 5 - XOffset + DEFAULT_LIST_CANVAS_INCREMENT, m_StartY + DEFAULT_LIST_CANVAS_HEIGHT);
+            graphics.drawString(messageObject.message, 5 - XOffset + DEFAULT_LIST_CANVAS_INCREMENT, m_StartY + DEFAULT_LIST_CANVAS_HEIGHT);
         }
     }
 
@@ -229,9 +229,9 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         chatclient.getTapPanel().CmdIgnoreUser.setLabel("Ignore User");
         for (count = 0; count < m_listArraySize; count++) {
             messageobject = ListArray.get(count);
-            if ((CurrentY >= messageobject.StartY) && (CurrentY <= (messageobject.StartY + DEFAULT_LIST_CANVAS_HEIGHT))) {
-                messageobject.Selected = true;
-                SelectedUser = messageobject.Message;
+            if ((CurrentY >= messageobject.startY) && (CurrentY <= (messageobject.startY + DEFAULT_LIST_CANVAS_HEIGHT))) {
+                messageobject.selected = true;
+                SelectedUser = messageobject.message;
                 SelectedFlag = true;
 
                 if (CanvasType == ROOM_CANVAS) {
@@ -246,7 +246,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
                     }
                 }
             } else {
-                messageobject.Selected = false;
+                messageobject.selected = false;
             }
         }
         repaint();

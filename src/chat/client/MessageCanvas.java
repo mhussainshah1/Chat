@@ -78,29 +78,29 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         int m_startY = DEFAULT_MESSAGE_CANVAS_POSITION;
         if (MessageArray.size() > 0) {
             messageobject = MessageArray.get(MessageArray.size() - 1);
-            m_startY = messageobject.StartY + messageobject.Height;
+            m_startY = messageobject.startY + messageobject.height;
         }
 
         messageobject = new MessageObject();
-        messageobject.Message = Message;
-        messageobject.StartY = m_startY;
+        messageobject.message = Message;
+        messageobject.startY = m_startY;
         messageobject.MessageType = MessageType;
         /**
          * *****Is Image True********
          */
         if (Message.indexOf("~~") >= 0) {
-            messageobject.IsImage = true;
-            messageobject.Width = DEFAULT_ICON_WIDTH;
-            messageobject.Height = DEFAULT_ICON_HEIGHT;
+            messageobject.isImage = true;
+            messageobject.width = DEFAULT_ICON_WIDTH;
+            messageobject.height = DEFAULT_ICON_HEIGHT;
         } else {
-            messageobject.IsImage = false;
-            messageobject.Width = fontmetrics.stringWidth(Message);
-            messageobject.Height = fontmetrics.getHeight() + fontmetrics.getDescent();
+            messageobject.isImage = false;
+            messageobject.width = fontmetrics.stringWidth(Message);
+            messageobject.height = fontmetrics.getHeight() + fontmetrics.getDescent();
         }
         MessageArray.add(messageobject);
         MessageCount++;
-        TotalWidth = Math.max(TotalWidth, messageobject.Width);
-        TotalHeight = m_startY + messageobject.Height;
+        TotalWidth = Math.max(TotalWidth, messageobject.width);
+        TotalHeight = m_startY + messageobject.height;
         scrollview.setValues(TotalWidth, TotalHeight);
 
         int m_Height = TotalHeight - YOffset;
@@ -124,9 +124,9 @@ public class MessageCanvas extends Canvas implements CommonSettings {
                 return;
             }
             messageobject = MessageArray.get(count);
-            if (messageobject.StartY >= YOffset) {
+            if (messageobject.startY >= YOffset) {
                 PaintMessageIntoCanvas(graphics, messageobject);
-                m_StartPos = messageobject.StartY;
+                m_StartPos = messageobject.startY;
             }
         }
 
@@ -138,10 +138,10 @@ public class MessageCanvas extends Canvas implements CommonSettings {
 
     private void PaintMessageIntoCanvas(Graphics graphics, MessageObject messageObject) {
         graphics.setColor(Color.black);
-        int m_YPos = messageobject.StartY - YOffset;
+        int m_YPos = messageobject.startY - YOffset;
         int m_XPos = 5 - XOffset;
         int CustomWidth = 0;
-        String Message = messageobject.Message;
+        String Message = messageobject.message;
         /**
          * ***********Print The User Name in UserName Font *************
          */
@@ -164,7 +164,7 @@ public class MessageCanvas extends Canvas implements CommonSettings {
         /**
          * ********Print Image Area*******
          */
-        if (messageobject.IsImage) {
+        if (messageobject.isImage) {
             tokenizer = new StringTokenizer(Message, " ");
             while (tokenizer.hasMoreTokens()) {
                 TokenString = tokenizer.nextToken();
@@ -175,8 +175,8 @@ public class MessageCanvas extends Canvas implements CommonSettings {
                     try {
                         int m_ImageIndex = Integer.parseInt(TokenString.substring(2));
                         if ((m_ImageIndex >= 0) && (m_ImageIndex < chatclient.getIconCount())) {
-                            graphics.drawImage(chatclient.getIcon(m_ImageIndex), m_XPos + CustomWidth, m_YPos - 15, messageobject.Width, messageobject.Height, this);
-                            CustomWidth += messageobject.Width + HorizantalSpace;
+                            graphics.drawImage(chatclient.getIcon(m_ImageIndex), m_XPos + CustomWidth, m_YPos - 15, messageobject.width, messageobject.height, this);
+                            CustomWidth += messageobject.width + HorizantalSpace;
 
                         }
                     } catch (NumberFormatException e) {

@@ -39,12 +39,12 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         int StartY = IMAGE_CANVAS_START_POSITION;
         for (count = 1; count <= chatclient.getIconCount(); count++) {
             messageobject = new MessageObject();
-            messageobject.Message = (count - 1) + "";
-            messageobject.StartX = StartX;
-            messageobject.StartY = StartY;
-            messageobject.IsImage = true;
-            messageobject.Width = DEFAULT_ICON_WIDTH;
-            messageobject.Height = DEFAULT_ICON_HEIGHT;
+            messageobject.message = (count - 1) + "";
+            messageobject.startX = StartX;
+            messageobject.startY = StartY;
+            messageobject.isImage = true;
+            messageobject.width = DEFAULT_ICON_WIDTH;
+            messageobject.height = DEFAULT_ICON_HEIGHT;
             IconArray.add(messageobject);
             if (count % 6 == 0) {
                 StartX = IMAGE_CANVAS_START_POSITION;
@@ -64,20 +64,20 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
             messageobject = IconArray.get(count);
-            if ((messageobject.StartY + messageobject.Height) >= YOffset) {
+            if ((messageobject.startY + messageobject.height) >= YOffset) {
                 PaintImagesIntoCanvas(graphics, messageobject);
             }
         }
     }
 
     private void PaintImagesIntoCanvas(Graphics graphics, MessageObject messageObject) {
-        int m_StartY = messageObject.StartY - YOffset;
-        if (messageobject.Message.equals(SelectedImage)) {
-            graphics.draw3DRect(messageObject.StartX - 2, m_StartY - 2, DEFAULT_ICON_WIDTH + 2, DEFAULT_ICON_HEIGHT + 2, true);
+        int m_StartY = messageObject.startY - YOffset;
+        if (messageobject.message.equals(SelectedImage)) {
+            graphics.draw3DRect(messageObject.startX - 2, m_StartY - 2, DEFAULT_ICON_WIDTH + 2, DEFAULT_ICON_HEIGHT + 2, true);
         }
-        graphics.drawImage(chatclient.getIcon(Integer.parseInt(messageObject.Message)), messageObject.StartX, m_StartY, DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT, this);
+        graphics.drawImage(chatclient.getIcon(Integer.parseInt(messageObject.message)), messageObject.startX, m_StartY, DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT, this);
         graphics.setColor(Color.black);
-        graphics.drawString(ICON_NAME + messageObject.Message, messageObject.StartX - 1, m_StartY + DEFAULT_ICON_HEIGHT + 10);
+        graphics.drawString(ICON_NAME + messageObject.message, messageObject.startX - 1, m_StartY + DEFAULT_ICON_HEIGHT + 10);
     }
 
     public boolean handleEvent(Event event) {
@@ -109,8 +109,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
             messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.StartY + messageobject.Height) && (i <= messageobject.StartX + messageobject.Width)) {
-                SelectedImage = messageobject.Message;
+            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
+                SelectedImage = messageobject.message;
                 repaint();
                 break;
             }
@@ -124,8 +124,8 @@ public class EmotionCanvas extends Canvas implements CommonSettings {
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
             messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.StartY + messageobject.Height) && (i <= messageobject.StartX + messageobject.Width)) {
-                privatechat.addImageToTextField(messageobject.Message);
+            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
+                privatechat.addImageToTextField(messageobject.message);
                 break;
             }
         }
