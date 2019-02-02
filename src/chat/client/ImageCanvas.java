@@ -17,11 +17,10 @@ public class ImageCanvas extends Canvas implements CommonSettings {
     Graphics offGraphics;
     ChatClient chatclient;
     ArrayList<MessageObject> IconArray;
-    int count;
-    int XOffset, YOffset;
-    MessageObject messageobject;
+    int count, XOffset, YOffset;
+    MessageObject messageObject;
     ScrollView scrollview;
-    String SelectedImage;
+    String selectedImage;
 
     ImageCanvas(ChatClient Parent) {
         chatclient = Parent;
@@ -33,14 +32,14 @@ public class ImageCanvas extends Canvas implements CommonSettings {
         int StartX = IMAGE_CANVAS_START_POSITION;
         int StartY = IMAGE_CANVAS_START_POSITION;
         for (count = 1; count <= chatclient.getIconCount(); count++) {
-            messageobject = new MessageObject();
-            messageobject.message = (count - 1) + "";
-            messageobject.startX = StartX;
-            messageobject.startY = StartY;
-            messageobject.isImage = true;
-            messageobject.width = DEFAULT_ICON_WIDTH;
-            messageobject.height = DEFAULT_ICON_HEIGHT;
-            IconArray.add(messageobject);
+            messageObject = new MessageObject();
+            messageObject.message = (count - 1) + "";
+            messageObject.startX = StartX;
+            messageObject.startY = StartY;
+            messageObject.isImage = true;
+            messageObject.width = DEFAULT_ICON_WIDTH;
+            messageObject.height = DEFAULT_ICON_HEIGHT;
+            IconArray.add(messageObject);
             if (count % 3 == 0) {
                 StartX = IMAGE_CANVAS_START_POSITION;
                 StartY += DEFAULT_ICON_HEIGHT + DEFAULT_IMAGE_CANVAS_SPACE;
@@ -58,16 +57,16 @@ public class ImageCanvas extends Canvas implements CommonSettings {
     private void PaintFrame(Graphics graphics) {
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((messageobject.startY + messageobject.height) >= YOffset) {
-                PaintImagesIntoCanvas(graphics, messageobject);
+            messageObject = IconArray.get(count);
+            if ((messageObject.startY + messageObject.height) >= YOffset) {
+                PaintImagesIntoCanvas(graphics, messageObject);
             }
         }
     }
 
     private void PaintImagesIntoCanvas(Graphics graphics, MessageObject messageObject) {
         int m_StartY = messageObject.startY - YOffset;
-        if (messageobject.message.equals(SelectedImage)) {
+        if (this.messageObject.message.equals(selectedImage)) {
             graphics.draw3DRect(messageObject.startX - 2, m_StartY - 2, DEFAULT_ICON_WIDTH + 2, DEFAULT_ICON_HEIGHT + 2, true);
         }
         graphics.drawImage(chatclient.getIcon(Integer.parseInt(messageObject.message)), messageObject.startX, m_StartY, DEFAULT_ICON_WIDTH, DEFAULT_ICON_HEIGHT, this);
@@ -103,13 +102,13 @@ public class ImageCanvas extends Canvas implements CommonSettings {
         int CurrentY = j + YOffset;
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
-                SelectedImage = messageobject.message;
+            messageObject = IconArray.get(count);
+            if ((CurrentY <= messageObject.startY + messageObject.height) && (i <= messageObject.startX + messageObject.width)) {
+                selectedImage = messageObject.message;
                 repaint();
                 break;
             }
-            SelectedImage = null;
+            selectedImage = null;
         }
         return true;
     }
@@ -118,9 +117,9 @@ public class ImageCanvas extends Canvas implements CommonSettings {
         int CurrentY = j + YOffset;
         int m_iconListSize = IconArray.size();
         for (count = 0; count < m_iconListSize; count++) {
-            messageobject = IconArray.get(count);
-            if ((CurrentY <= messageobject.startY + messageobject.height) && (i <= messageobject.startX + messageobject.width)) {
-                chatclient.addImageToTextField(messageobject.message);
+            messageObject = IconArray.get(count);
+            if ((CurrentY <= messageObject.startY + messageObject.height) && (i <= messageObject.startX + messageObject.width)) {
+                chatclient.addImageToTextField(messageObject.message);
                 break;
             }
         }

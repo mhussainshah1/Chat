@@ -1,17 +1,15 @@
-package chat.client;
+package extra;
 
 import java.awt.Panel;
 import java.awt.Dimension;
 
 class CustomPanel extends Panel {
-    /**
-     * ***********Global Variable Declarations*********
-     */
-    public Dimension dimension;
+
+    private Dimension dimension;
 
     public CustomPanel(int i, int j) {
         dimension = new Dimension(i, j);
-        resize(dimension);
+        setSize(dimension);//resize(dimension);
         validate();
     }
 
@@ -22,7 +20,7 @@ class CustomPanel extends Panel {
 
     @Override
     public Dimension preferredSize() {
-        return size();
+        return getSize();//size();
     }
 
 }

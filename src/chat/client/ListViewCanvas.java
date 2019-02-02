@@ -11,9 +11,6 @@ import java.util.ArrayList;
 
 public class ListViewCanvas extends Canvas implements CommonSettings {
 
-    /**
-     * *********Global Variable Declarations***************
-     */
     Dimension offDimension, dimension;
     Image offImage;
     Graphics offGraphics;

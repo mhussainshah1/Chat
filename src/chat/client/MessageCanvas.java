@@ -8,7 +8,6 @@ import java.awt.Event;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Cursor;
 import java.awt.FontMetrics;
 import java.util.StringTokenizer;
 

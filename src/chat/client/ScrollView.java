@@ -3,13 +3,12 @@ package chat.client;
 import java.awt.*;
 
 public class ScrollView extends Panel {
-
-
     Component Item;
     public ScrollBar HorScroll, VerScroll;
     boolean HsbDisabled, VsbDisabled;
     int SbSize, ContentWidth, ContentHeight;
     public Dimension Dim;
+    
     public ScrollView(Component component, boolean flag, boolean flag1, int i, int j, int k) {
         Item = component;
         SbSize = k;
