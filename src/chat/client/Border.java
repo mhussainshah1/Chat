@@ -1,16 +1,17 @@
 package chat.client;
 
-import java.awt.*;
-import java.awt.Graphics;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Event;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public class Border extends Canvas implements CommonSettings {
 
-    int mode;
-    int width;
-    int height;
-    int size;
-    int bsize;
+    int mode,width,height, size, bsize;
     Dimension dim;
     BorderPanel parent;
     TapPanel Cframe;
@@ -44,10 +45,10 @@ public class Border extends Canvas implements CommonSettings {
             height = 8;
         }
         dim = new Dimension(width, height);
-        resize(dim);
+        setSize(dim);//resize(dim);
         validate();
     }
-    public void DrawBottom(Graphics g) {
+    public void drawBottom(Graphics g) {
         int i = getSize().width;
         int j = getSize().height;
         g.setColor(SSTABBUTTON);
@@ -66,29 +67,30 @@ public class Border extends Canvas implements CommonSettings {
         g.drawLine(i - 1, 0, i - 1, j - 1);
     }
 
+    @Override
     public void paint(Graphics g) {
         if (mode == 1) {
-            DrawTabs(g);
+            drawTabs(g);
             return;
         }
         if (mode == 2) {
-            DrawVertical(g);
+            drawVertical(g);
             return;
         }
         if (mode == 3) {
-            DrawVertical(g);
+            drawVertical(g);
             return;
         }
         if (mode == 4) {
-            DrawBottom(g);
+            drawBottom(g);
             return;
         } else {
-            DrawHorizontal(g);
+            drawHorizontal(g);
             return;
         }
     }
 
-    public void DrawTab(Graphics g, int i, int j, int k, int l, boolean flag, String s) {
+    public void drawTab(Graphics g, int i, int j, int k, int l, boolean flag, String s) {
         g.setColor(SSTABBUTTON);
         g.fillRect(i, j, k, l);
         g.setColor(SSTABBUTTON);
@@ -115,7 +117,7 @@ public class Border extends Canvas implements CommonSettings {
         repaint();
     }
 
-    public void DrawTop(Graphics g) {
+    public void drawTop(Graphics g) {
         int i = getSize().width;
         int j = getSize().height;
         g.setColor(BACKGROUND);
@@ -136,15 +138,17 @@ public class Border extends Canvas implements CommonSettings {
         g.drawLine(i - 1, 1, i - 1, j + 1);
     }
 
+    @Override
     public Dimension minimumSize() {
         return dim;
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
 
-    public void DrawVertical(Graphics g) {
+    public void drawVertical(Graphics g) {
         int i = getSize().height;
         g.setColor(SSTABBUTTON);
         g.drawLine(0, 0, 0, i);
@@ -157,16 +161,19 @@ public class Border extends Canvas implements CommonSettings {
         g.drawLine(bsize + 3, 0, bsize + 3, i);
     }
 
+    @Override
     public boolean mouseEnter(Event event, int i, int j) {
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         return true;
     }
 
+    @Override
     public boolean mouseExit(Event event, int i, int j) {
         setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         return true;
     }
 
+    @Override
     public boolean mouseDown(Event event, int i, int j) {
         if (mode != 1) {
             return true;
@@ -181,11 +188,12 @@ public class Border extends Canvas implements CommonSettings {
         return true;
     }
 
+    @Override
     public Dimension preferredSize() {
         return minimumSize();
     }
 
-    public void DrawTabs(Graphics g) {
+    public void drawTabs(Graphics g) {
         int i = getSize().width;
         int k = getSize().height;
         int l = k - (bsize + 4);
@@ -223,15 +231,15 @@ public class Border extends Canvas implements CommonSettings {
             rectangle1.width = TAPPANEL_WIDTH / TAP_COUNT;
             rectangle1.height = tabHeight;
             parent.tabPos.addElement(rectangle1);
-            DrawTab(g, rectangle1.x, rectangle1.y, rectangle1.width, rectangle1.height, false, s);
+            drawTab(g, rectangle1.x, rectangle1.y, rectangle1.width, rectangle1.height, false, s);
             i1 += rectangle1.width;
         }
 
         Rectangle rectangle = (Rectangle) parent.tabPos.elementAt(parent.curTab);
-        DrawTab(g, rectangle.x, rectangle.y - 4, rectangle.width + 2, rectangle.height + 5, true, (String) parent.tabNames.elementAt(parent.curTab));
+        drawTab(g, rectangle.x, rectangle.y - 4, rectangle.width + 2, rectangle.height + 5, true, (String) parent.tabNames.elementAt(parent.curTab));
     }
 
-    public void DrawHorizontal(Graphics g) {
+    public void drawHorizontal(Graphics g) {
         g.setColor(SSTABBUTTON);
         g.fillRect(0, 0, width, height);
         g.setColor(SSTABBUTTON);
