@@ -5,18 +5,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.net.*;
 import java.io.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.html.*;
-
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
+import javax.swing.text.html.*;
 
 public class ClientGui extends Thread {
+    public static void main(String[] args) throws Exception {
+        ClientGui client = new ClientGui();
+    }
 
     final JTextPane jtextFilDiscu = new JTextPane();
     final JTextPane jtextListUsers = new JTextPane();
@@ -122,18 +124,18 @@ public class ClientGui extends Thread {
         jtfport.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
         jtfAddr.getDocument().addDocumentListener(new TextListener(jtfName, jtfport, jtfAddr, jcbtn));
 
-        // position des Modules
+        // position of the Modules
         jcbtn.setFont(font);
         jtfAddr.setBounds(25, 380, 135, 40);
         jtfName.setBounds(375, 380, 135, 40);
         jtfport.setBounds(200, 380, 135, 40);
         jcbtn.setBounds(575, 380, 100, 40);
 
-        // couleur par defaut des Modules fil de discussion et liste des utilisateurs
+        // default color of Thread Modules and User List
         jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
         jtextListUsers.setBackground(Color.LIGHT_GRAY);
 
-        // ajout des éléments
+        //adding elements
         jfr.add(jcbtn);
         jfr.add(jtextFilDiscuSP);
         jfr.add(jsplistuser);
@@ -142,7 +144,7 @@ public class ClientGui extends Thread {
         jfr.add(jtfAddr);
         jfr.setVisible(true);
 
-        // info sur le Chat
+        // chat info
         appendToPane(jtextFilDiscu, "<h4>The possible commands in the chat are:</h4>"
                 + "<ul>"
                 + "<li><b>@nickname</b> to send a Private Message to the user 'nickname'</li>"
@@ -191,8 +193,9 @@ public class ClientGui extends Thread {
             }
         });
 
-        // on deco
+        // on dis connection
         jsbtndeco.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 jfr.add(jtfName);
                 jfr.add(jtfport);
@@ -211,50 +214,9 @@ public class ClientGui extends Thread {
                 output.close();
             }
         });
-
     }
 
-    // check if if all field are not empty
-    public class TextListener implements DocumentListener {
-
-        JTextField jtf1;
-        JTextField jtf2;
-        JTextField jtf3;
-        JButton jcbtn;
-
-        public TextListener(JTextField jtf1, JTextField jtf2, JTextField jtf3, JButton jcbtn) {
-            this.jtf1 = jtf1;
-            this.jtf2 = jtf2;
-            this.jtf3 = jtf3;
-            this.jcbtn = jcbtn;
-        }
-
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-        public void removeUpdate(DocumentEvent e) {
-            if (jtf1.getText().trim().equals("")
-                    || jtf2.getText().trim().equals("")
-                    || jtf3.getText().trim().equals("")) {
-                jcbtn.setEnabled(false);
-            } else {
-                jcbtn.setEnabled(true);
-            }
-        }
-
-        public void insertUpdate(DocumentEvent e) {
-            if (jtf1.getText().trim().equals("")
-                    || jtf2.getText().trim().equals("")
-                    || jtf3.getText().trim().equals("")) {
-                jcbtn.setEnabled(false);
-            } else {
-                jcbtn.setEnabled(true);
-            }
-        }
-
-    }
-
-    // envoi des messages
+    // sending messages
     public void sendMessage() {
         try {
             String message = jtextInputChat.getText().trim();
@@ -270,9 +232,61 @@ public class ClientGui extends Thread {
             System.exit(0);
         }
     }
+    // send html to pane
+    private void appendToPane(JTextPane tp, String msg) {
+        HTMLDocument doc = (HTMLDocument) tp.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+            tp.setCaretPosition(doc.getLength());
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    //Inner Classes
+    
+    // check if if all field are not empty
+    public class TextListener implements DocumentListener {
 
-    public static void main(String[] args) throws Exception {
-        ClientGui client = new ClientGui();
+        JTextField jtf1;
+        JTextField jtf2;
+        JTextField jtf3;
+        JButton jcbtn;
+
+        public TextListener(JTextField jtf1, JTextField jtf2, JTextField jtf3, JButton jcbtn) {
+            this.jtf1 = jtf1;
+            this.jtf2 = jtf2;
+            this.jtf3 = jtf3;
+            this.jcbtn = jcbtn;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            if (jtf1.getText().trim().equals("")
+                    || jtf2.getText().trim().equals("")
+                    || jtf3.getText().trim().equals("")) {
+                jcbtn.setEnabled(false);
+            } else {
+                jcbtn.setEnabled(true);
+            }
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            if (jtf1.getText().trim().equals("")
+                    || jtf2.getText().trim().equals("")
+                    || jtf3.getText().trim().equals("")) {
+                jcbtn.setEnabled(false);
+            } else {
+                jcbtn.setEnabled(true);
+            }
+        }
+
     }
 
     // read new incoming messages
@@ -302,18 +316,6 @@ public class ClientGui extends Thread {
                     ex.printStackTrace();
                 }
             }
-        }
-    }
-
-    // send html to pane
-    private void appendToPane(JTextPane tp, String msg) {
-        HTMLDocument doc = (HTMLDocument) tp.getDocument();
-        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
-        try {
-            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
-            tp.setCaretPosition(doc.getLength());
-        } catch (IOException | BadLocationException e) {
-            e.printStackTrace();
         }
     }
 }
