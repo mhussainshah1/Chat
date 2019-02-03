@@ -232,6 +232,7 @@ public class ClientGui extends Thread {
             System.exit(0);
         }
     }
+    
     // send html to pane
     private void appendToPane(JTextPane tp, String msg) {
         HTMLDocument doc = (HTMLDocument) tp.getDocument();

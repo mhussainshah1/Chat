@@ -22,7 +22,6 @@ public class Server {
     private List<User> clients;
     private ServerSocket server;
 
-
     public Server(int port) {
         this.port = port;
         this.clients = new ArrayList<User>();
