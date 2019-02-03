@@ -46,7 +46,7 @@ public class ClientGui extends Thread {
         jfr.setResizable(false);
         jfr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Module du fil de discussion
+        // Thread module
         jtextFilDiscu.setBounds(25, 25, 490, 320);
         jtextFilDiscu.setFont(font);
         jtextFilDiscu.setMargin(new Insets(6, 6, 6, 6));
@@ -57,7 +57,7 @@ public class ClientGui extends Thread {
         jtextFilDiscu.setContentType("text/html");
         jtextFilDiscu.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
 
-        // Module de la liste des utilisateurs
+        // Module of the list of users
         jtextListUsers.setBounds(520, 25, 156, 320);
         jtextListUsers.setEditable(true);
         jtextListUsers.setFont(font);
@@ -193,7 +193,7 @@ public class ClientGui extends Thread {
             }
         });
 
-        // on dis connection
+        // on disconnection
         jsbtndeco.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {

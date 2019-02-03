@@ -11,13 +11,13 @@ import java.util.Scanner;
 import java.io.StringReader;
 
 public class Client {
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        new Client("127.0.0.1", 12345).run();
+    }
 
     private String host;
     private int port;
 
-    public static void main(String[] args) throws UnknownHostException, IOException {
-        new Client("127.0.0.1", 12345).run();
-    }
 
     public Client(String host, int port) {
         this.host = host;
