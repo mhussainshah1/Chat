@@ -59,6 +59,10 @@ public class Client {
 }
 
 class ReceivedMessagesHandler implements Runnable {
+    // I could use a javax.xml.parsers but the goal of Client.java is to keep everything tight and simple
+    public static String getTagValue(String xml) {
+        return xml.split(">")[2].split("<")[0] + xml.split("<span>")[1].split("</span>")[0];
+    }
 
     private InputStream server;
 
@@ -66,6 +70,7 @@ class ReceivedMessagesHandler implements Runnable {
         this.server = server;
     }
 
+    @Override
     public void run() {
         // receive server messages and print out to screen
         Scanner s = new Scanner(server);
@@ -89,8 +94,4 @@ class ReceivedMessagesHandler implements Runnable {
         s.close();
     }
 
-    // I could use a javax.xml.parsers but the goal of Client.java is to keep everything tight and simple
-    public static String getTagValue(String xml) {
-        return xml.split(">")[2].split("<")[0] + xml.split("<span>")[1].split("</span>")[0];
-    }
 }
