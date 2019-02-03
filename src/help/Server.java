@@ -15,24 +15,23 @@ import java.awt.Color;
 
 public class Server {
 
-    public static void main(String[] args) throws IOException {
-        new Server(12345).run();
-    }
-
     private int port;
     private List<User> clients;
     private ServerSocket server;
 
+    public static void main(String[] args) throws IOException {
+        new Server(12345).run();
+    }
+
     public Server(int port) {
         this.port = port;
-        this.clients = new ArrayList<>();
+        this.clients = new ArrayList<User>();
     }
 
     public void run() throws IOException {
         server = new ServerSocket(port) {
             @Override
-            protected void finalize() throws IOException, Throwable {
-                super.finalize();
+            protected void finalize() throws IOException {
                 this.close();
             }
         };
@@ -102,7 +101,6 @@ public class Server {
         }
     }
 }
-//Inner Classes
 
 class UserHandler implements Runnable {
 
@@ -135,31 +133,27 @@ class UserHandler implements Runnable {
             message = message.replace(":o", "<img src='http://1.bp.blogspot.com/-MB8OSM9zcmM/TvitChHcRRI/AAAAAAAAAiE/kdA6RbnbzFU/s400/surprised%2Bemoticon.png'>");
             message = message.replace(":O", "<img src='http://1.bp.blogspot.com/-MB8OSM9zcmM/TvitChHcRRI/AAAAAAAAAiE/kdA6RbnbzFU/s400/surprised%2Bemoticon.png'>");
 
-            // Private message management
-            switch (message.charAt(0)) {
-                case '@':
-                    if (message.contains(" ")) {
-                        System.out.println("private msg : " + message);
-                        int firstSpace = message.indexOf(" ");
-                        String userPrivate = message.substring(1, firstSpace);
-                        server.sendMessageToUser(
-                                message.substring(
-                                        firstSpace + 1, message.length()
-                                ), user, userPrivate
-                        );
-                    }
+            // Gestion des messages private
+            if (message.charAt(0) == '@') {
+                if (message.contains(" ")) {
+                    System.out.println("private msg : " + message);
+                    int firstSpace = message.indexOf(" ");
+                    String userPrivate = message.substring(1, firstSpace);
+                    server.sendMessageToUser(
+                            message.substring(
+                                    firstSpace + 1, message.length()
+                            ), user, userPrivate
+                    );
+                }
 
-                    // Change management
-                    break;
-                case '#':
-                    user.changeColor(message);
-                    // update color for all other users
-                    this.server.broadcastAllUsers();
-                    break;
-                default:
-                    // update user list
-                    server.broadcastMessages(message, user);
-                    break;
+                // Gestion du changement
+            } else if (message.charAt(0) == '#') {
+                user.changeColor(message);
+                // update color for all other users
+                this.server.broadcastAllUsers();
+            } else {
+                // update user list
+                server.broadcastMessages(message, user);
             }
         }
         // end of Thread
