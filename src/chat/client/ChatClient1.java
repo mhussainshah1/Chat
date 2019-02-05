@@ -448,9 +448,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     sendMessageToServer("KICK " + userName + "~" + userRoom);
                 }
                 socket.close();
-                socket = null;
-                //tapPanel.userCanvas.clearAll();
-                userCanvas.clearSelection();
+                socket = null;               
+                userListModel.clear(); //tapPanel.userCanvas.clearAll();
             } catch (IOException ie) {
                 ie.printStackTrace();
             }
@@ -490,8 +489,9 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                         userListModel.addElement(tokenizer.nextToken()); //tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
-                    messageCanvas.ClearAll();
-                    messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
+                    messageCanvas.setText("");//messageCanvas.ClearAll();
+                    appendToPane(messageCanvas,"<span> Welcome To The " + userRoom + " Room!</span>");
+                    //messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
@@ -532,14 +532,16 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     splitString = serverData.substring(5);
                     enablePrivateWindow(splitString);
                     userListModel.addElement(splitString);//tapPanel.userCanvas.addListItemToMessageObject(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                    appendToPane(messageCanvas, "<span>" + splitString + " joins chat...</span>");
+                            //messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
                  * *******If User Name Already Exists *********
                  */
                 if (serverData.startsWith("EXIS")) {
-                    messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas,"<span> User Name Already Exists... Try Again With Some Other Name!</span>");
+                    //messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
                     thread = null;
                     quitConnection(QUIT_TYPE_NULL);
                 }
@@ -554,7 +556,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     userListModel.removeElement(splitString);
 
                     removeUserFromPrivateChat(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
+                    appendToPane(messageCanvas,"<span>" +splitString + " has been logged Out from Chat!</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 
                     /**
                      * ***Update the Information Label *******
@@ -572,7 +575,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                      * ** Check whether ignored user ********
                      */
                     if (!(tapPanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
-                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
+                        appendToPane(messageCanvas, "<span>"+serverData.substring(5)+"</span>");
+//                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
                 }
 
@@ -580,7 +584,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                  * *** KICK RFC Starts **********
                  */
                 if (serverData.startsWith("KICK")) {
-                    messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas, "<span>You are Kicked Out From Chat for flooding the message!</span>");
+//                    messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
                     thread = null;
                     quitConnection(QUIT_TYPE_KICK);
                 }
@@ -593,7 +598,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     //tapPanel.userCanvas.removeListItem(splitString);
                     userListModel.removeElement(splitString);
                     removeUserFromPrivateChat(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas,"<span>"+splitString + " has been kicked Out from Chat by the Administrator!</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 
                     /**
                      * ***Update the Information Label *******
@@ -621,8 +627,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                      */
                     totalUserCount++;
                     updateInformationLabel();
-
-                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                    appendToPane(messageCanvas, "<span>" + splitString + " joins chat...</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
@@ -631,7 +637,11 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                 if (serverData.startsWith("LERO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
                     userListModel.removeElement(splitString);//)tapPanel.userCanvas.removeListItem(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas,"<span>" +splitString + " has leaves " + 
+                            userRoom + " Room and join into " + 
+                            serverData.substring(serverData.indexOf("~") + 1) + 
+                            " Room</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 
                     /**
                      * ***Update the Information Label *******
@@ -670,7 +680,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
                         if (!(PrivateFlag)) {
                             if (privateWindowCount >= MAX_PRIVATE_WINDOW) {
-                                messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
+                                appendToPane(messageCanvas, "<span>You are Exceeding private window limit! So you may lose some message from your friends!</span>");
+//                                messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
                             } else {
                                 privateWindows[privateWindowCount++] = new PrivateChat(this, splitString);
                                 privateWindows[privateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
@@ -681,7 +692,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
+                appendToPane(messageCanvas, "<span>"+e.getMessage()+"</span>");
+//                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
                 quitConnection(QUIT_TYPE_DEFAULT);
                 e.printStackTrace();
             }
@@ -691,9 +703,10 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
     /**
      * ********Setting the appletStatus*******
      */
-    private void setAppletStatus(String Message) {
+    private void setAppletStatus(String message) {
         if (messageCanvas != null) {
-            messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
+            appendToPane(messageCanvas,"<span>"+message+"</span>");
+            //messageCanvas.addMessageToMessageObject(message, MESSAGE_TYPE_ADMIN);
         }
     }
 
@@ -744,7 +757,8 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
      */
     private void disconnectChat() {
         if (socket != null) {
-            messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
+            appendToPane(messageCanvas, "<span>CONNECTION TO THE SERVER CLOSED</span>");
+//            messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
             quitConnection(QUIT_TYPE_DEFAULT);
         }
     }
@@ -808,12 +822,14 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         int index = roomCanvas.getSelectedIndex();    
         String user = roomListModel.get(index);
         if (user.equals("")) {
-            messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
+            appendToPane(messageCanvas, "<span> Invalid Room Selection!</span>");
+//            messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
         if (user.equals(userRoom)) {
-            messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
+             appendToPane(messageCanvas, "<span> You are already in that ROOM!</span>");
+//            messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
@@ -843,8 +859,9 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         /**
          * *********Initialize the Socket******
          */
-        messageCanvas.ClearAll();
-        messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...", MESSAGE_TYPE_ADMIN);
+        messageCanvas.setText("");//messageCanvas.ClearAll();
+        appendToPane(messageCanvas, "<span>Connecting To Server... Please Wait...</span>");
+//        messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...", MESSAGE_TYPE_ADMIN);
         /**
          * *********Initialize the Socket******
          */
