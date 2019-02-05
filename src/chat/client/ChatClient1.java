@@ -6,24 +6,95 @@ import chat.client.net.SocksSocketImplFactory;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.StringTokenizer;
+import javax.swing.DefaultListModel;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
-/**
- *
- * @author m_hus
- */
 public class ChatClient1 extends javax.swing.JFrame implements Runnable {
+
+    private Image imgLogo, imgBanner;
+    private MediaTracker tracker;
+    private Image[] iconArray;
+    protected PrivateChat[] privateWindows;
+    protected int count, iconCount, privateWindowCount;
+    private InformationDialog dialog;
+    private Toolkit theKit;
+    private String chatLogo, bannerName;
+    private StringBuffer stringBuffer;
+    private String appletStatus;
 
     /**
      * Creates new form ChatClient1
      */
     public ChatClient1() {
+        /**
+         * ********Getting all the Parameters**********
+         */
+        userName = "";
+        userRoom = "";
+        roomList = "";
+        isProxy = false;
+        chatLogo = "images/logo.gif";
+        bannerName = "images/defaultbanner.gif";
+        iconCount = 21;
+
+        /**
+         * ********Loading Images********
+         */
+        theKit = this.getToolkit();
+        tracker = new MediaTracker(this);
+        int imageCount = 0;
+        imgLogo = theKit.getImage(chatLogo);
+        tracker.addImage(imgLogo, imageCount);
+        imageCount++;
+        imgBanner = theKit.getImage(bannerName);
+        tracker.addImage(imgBanner, imageCount);
+        imageCount++;
+
+        /**
+         * ********Loading Icons....**********
+         */
+        iconArray = new Image[iconCount];
+        for (count = 0; count < iconCount; count++) {
+            iconArray[count] = theKit.getImage("icons/photo" + count + ".gif");
+            tracker.addImage(iconArray[count], imageCount);
+            imageCount++;
+        }
+
+        /**
+         * *******Initialize Private Window *********
+         */
+        privateWindows = new PrivateChat[MAX_PRIVATE_WINDOW];
+        privateWindowCount = 0;
+
+        try {
+            setAppletStatus("Loading Images and Icons.....");
+            tracker.waitForAll();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        setIconImage(theKit.getImage("images/logo.gif"));
+        setAppletStatus("");
+        /**
+         * ********Initializing all the Components********
+         */
         initComponents();
+        userListModel = new DefaultListModel<>();
+        userCanvas.setModel(userListModel);
+
+        roomListModel = new DefaultListModel<>();
+        roomCanvas.setModel(roomListModel);
+        
         loginToChat();
     }
 
@@ -54,19 +125,21 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         userPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        userCanvas = new javax.swing.JList<>();
         userButtonPanel = new javax.swing.JPanel();
         btnSendDirect = new javax.swing.JButton();
         btnIgnoreUser = new javax.swing.JButton();
         roomPanel = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList<>();
+        roomScrollPane = new javax.swing.JScrollPane();
+        roomCanvas = new javax.swing.JList<>();
         roomButtonPanel = new javax.swing.JPanel();
         roomCountPanel = new javax.swing.JPanel();
         lblCaption = new javax.swing.JLabel();
         txtUserCount = new javax.swing.JTextField();
         btnChangeRoom = new javax.swing.JButton();
         imagesPanel = new javax.swing.JPanel();
+        userScrollPane = new javax.swing.JScrollPane();
+        imageCanvas = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         messageCanvas = new javax.swing.JTextPane();
         menuBar = new javax.swing.JMenuBar();
@@ -79,6 +152,12 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         aboutItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("PRODUCT_NAME");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         topPanel.setLayout(new java.awt.BorderLayout());
 
@@ -159,12 +238,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         userPanel.setLayout(new java.awt.BorderLayout());
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(userCanvas);
 
         userPanel.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -182,14 +256,14 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         roomPanel.setLayout(new java.awt.BorderLayout());
 
-        jList2.setModel(new javax.swing.AbstractListModel<String>() {
+        roomCanvas.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane3.setViewportView(jList2);
+        roomScrollPane.setViewportView(roomCanvas);
 
-        roomPanel.add(jScrollPane3, java.awt.BorderLayout.CENTER);
+        roomPanel.add(roomScrollPane, java.awt.BorderLayout.CENTER);
 
         roomButtonPanel.setLayout(new java.awt.BorderLayout());
 
@@ -213,16 +287,11 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         jTabbedPane1.addTab("Rooms", roomPanel);
 
-        javax.swing.GroupLayout imagesPanelLayout = new javax.swing.GroupLayout(imagesPanel);
-        imagesPanel.setLayout(imagesPanelLayout);
-        imagesPanelLayout.setHorizontalGroup(
-            imagesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 237, Short.MAX_VALUE)
-        );
-        imagesPanelLayout.setVerticalGroup(
-            imagesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 417, Short.MAX_VALUE)
-        );
+        imagesPanel.setLayout(new java.awt.BorderLayout());
+
+        userScrollPane.setViewportView(imageCanvas);
+
+        imagesPanel.add(userScrollPane, java.awt.BorderLayout.CENTER);
 
         jTabbedPane1.addTab("Images", imagesPanel);
 
@@ -252,7 +321,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         helpMenu.setText("Help");
 
-        aboutItem.setText("About");
+        aboutItem.setText("About" + PRODUCT_NAME);
         helpMenu.add(aboutItem);
 
         menuBar.add(helpMenu);
@@ -261,6 +330,11 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        disconnectChat();
+        System.exit(0);
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -285,16 +359,14 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
     private javax.swing.JPanel emptyPanel;
     private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JTextPane imageCanvas;
     private javax.swing.JPanel imagesPanel;
     private javax.swing.JLabel informationLabel;
     private javax.swing.JPanel informationPanel;
     private javax.swing.JPanel inputButtonPanel;
     private javax.swing.JPanel inputPanel;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JList<String> jList2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCaption;
@@ -305,16 +377,33 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTextPane messageCanvas;
     private javax.swing.JPanel roomButtonPanel;
+    private javax.swing.JList<String> roomCanvas;
     private javax.swing.JPanel roomCountPanel;
     private javax.swing.JPanel roomPanel;
+    private javax.swing.JScrollPane roomScrollPane;
     private javax.swing.JPanel tapPanel;
     private javax.swing.JPanel textBoxPanel;
     private javax.swing.JTextField textMessage;
     private javax.swing.JPanel topPanel;
     private javax.swing.JTextField txtUserCount;
     private javax.swing.JPanel userButtonPanel;
+    private javax.swing.JList<String> userCanvas;
     private javax.swing.JPanel userPanel;
+    private javax.swing.JScrollPane userScrollPane;
     // End of variables declaration//GEN-END:variables
+    private DefaultListModel<String> userListModel , roomListModel;
+    
+    //For future Network class 
+    private String userName, serverData, roomList, splitString;
+    private String userRoom, serverName, proxyHost;
+    private int serverPort, proxyPort, totalUserCount;
+    private boolean startFlag, isProxy;
+    private Socket socket;
+    private BufferedReader in; //private DataInputStream in;
+    private DataOutputStream out;
+
+    private Thread thread;
+    private StringTokenizer tokenizer;
 
     private void loginToChat() {
         /**
@@ -325,11 +414,11 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
             userName = dialog.getTxtUserName();
             //UserRoom 	= dialog.roomchoice.getSelectedItem();
             serverName = dialog.getTxtServerName();
-            ServerPort = Integer.parseInt(dialog.getTxtServerPort());
+            serverPort = Integer.parseInt(dialog.getTxtServerPort());
             if (dialog.isProxyCheckBox()) {//getState()
                 isProxy = true;
                 proxyHost = dialog.getTxtProxyHost();
-                ProxyPort = Integer.parseInt(dialog.getTxtProxyPort());
+                proxyPort = Integer.parseInt(dialog.getTxtProxyPort());
             } else {
                 isProxy = false;
             }
@@ -337,33 +426,448 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         }
     }
 
+    private void sendMessageToServer(String message) {
+        try {
+            out.writeBytes(message + "\r\n");
+        } catch (IOException ie) {
+            quitConnection(QUIT_TYPE_DEFAULT);
+            ie.printStackTrace();
+        }
+    }
+
+    /**
+     * *******Function to Destroy all the Objects*******
+     */
+    private void quitConnection(int QuitType) {
+        if (socket != null) {
+            try {
+                if (QuitType == QUIT_TYPE_DEFAULT) {
+                    sendMessageToServer("QUIT " + userName + "~" + userRoom);
+                }
+                if (QuitType == QUIT_TYPE_KICK) {
+                    sendMessageToServer("KICK " + userName + "~" + userRoom);
+                }
+                socket.close();
+                socket = null;
+                //tapPanel.userCanvas.clearAll();
+                userCanvas.clearSelection();
+            } catch (IOException ie) {
+                ie.printStackTrace();
+            }
+        }
+        if (thread != null) {
+            thread.interrupt();//stop();
+            thread = null;
+        }
+        disableAll();
+        startFlag = false;
+        setAppletStatus("ADMIN: CONNECTION TO THE SERVER CLOSED.");
+    }
+
+    /**
+     * ******Implements the Thread ***************
+     */
+    @Override
+    public void run() {
+        while (thread != null) {
+            try {
+                serverData = in.readLine();
+                /**
+                 * ******* LIST UserName;UserName; RFC Coding**********
+                 */
+                if (serverData.startsWith("LIST")) {
+                    tokenizer = new StringTokenizer(serverData.substring(5), ";");
+                    /**
+                     * ******Update the Information Label ********
+                     */
+                    totalUserCount = tokenizer.countTokens();
+                    updateInformationLabel();
+                    /**
+                     * ********Add User Item into User Canvas ********
+                     */
+                    userListModel.clear();//tapPanel.userCanvas.clearAll();
+                    while (tokenizer.hasMoreTokens()) {
+                        userListModel.addElement(tokenizer.nextToken()); //tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                    }
+
+                    messageCanvas.ClearAll();
+                    messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
+                }
+
+                /**
+                 * *******Room RFC *******
+                 */
+                if (serverData.startsWith("ROOM")) {
+                    /**
+                     * ******** Loading Room List in to Room Canvas
+                     * *************
+                     */
+                    tokenizer = new StringTokenizer(serverData.substring(5), ";");
+                    userRoom = tokenizer.nextToken();
+                    updateInformationLabel();
+                    /**
+                     * ********Add User Item into User Canvas ********
+                     */
+                    roomListModel.clear();//tapPanel.roomCanvas.clearAll();
+                    roomListModel.addElement(userRoom);//tapPanel.roomCanvas.addListItemToMessageObject(userRoom);
+                    while (tokenizer.hasMoreTokens()) {
+                        roomListModel.addElement(tokenizer.nextToken());   
+                        //tapPanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                    }                  
+                }
+
+                /**
+                 * ******** ADD RFC ********
+                 */
+                if (serverData.startsWith("ADD")) {
+                    /**
+                     * ******Update the Information Label ********
+                     */
+                    totalUserCount++;
+                    updateInformationLabel();
+
+                    /**
+                     * ********Add User Item into User Canvas ********
+                     */
+                    splitString = serverData.substring(5);
+                    enablePrivateWindow(splitString);
+                    userListModel.addElement(splitString);//tapPanel.userCanvas.addListItemToMessageObject(splitString);
+                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                }
+
+                /**
+                 * *******If User Name Already Exists *********
+                 */
+                if (serverData.startsWith("EXIS")) {
+                    messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
+                    thread = null;
+                    quitConnection(QUIT_TYPE_NULL);
+                }
+
+                /**
+                 * ****** REMOVE User RFC Coding *********
+                 */
+                if (serverData.startsWith("REMO")) {
+                    splitString = serverData.substring(5); //REMO~NAME
+
+                    //tapPanel.userCanvas.removeListItem(splitString);
+                    userListModel.removeElement(splitString);
+
+                    removeUserFromPrivateChat(splitString);
+                    messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
+
+                    /**
+                     * ***Update the Information Label *******
+                     */
+                    totalUserCount--;
+                    updateInformationLabel();
+
+                }
+
+                /**
+                 * ****** MESS RFC Coding Starts *********
+                 */
+                if (serverData.startsWith("MESS")) {
+                    /**
+                     * ** Check whether ignored user ********
+                     */
+                    if (!(tapPanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
+                    }
+                }
+
+                /**
+                 * *** KICK RFC Starts **********
+                 */
+                if (serverData.startsWith("KICK")) {
+                    messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
+                    thread = null;
+                    quitConnection(QUIT_TYPE_KICK);
+                }
+
+                /**
+                 * *** INKI RFC (Information about kicked off User ********
+                 */
+                if (serverData.startsWith("INKI")) {
+                    splitString = serverData.substring(5);
+                    //tapPanel.userCanvas.removeListItem(splitString);
+                    userListModel.removeElement(splitString);
+                    removeUserFromPrivateChat(splitString);
+                    messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
+
+                    /**
+                     * ***Update the Information Label *******
+                     */
+                    totalUserCount--;
+                    updateInformationLabel();
+                }
+
+                /**
+                 * *** Change Room RFC *********
+                 */
+                if (serverData.startsWith("CHRO")) {
+                    userRoom = serverData.substring(5);
+                }
+
+                /**
+                 * ******** Join Room RFC ************
+                 */
+                if (serverData.startsWith("JORO")) {
+                    splitString = serverData.substring(5);
+                    userListModel.addElement(splitString);
+                    //tapPanel.userCanvas.addListItemToMessageObject(splitString);
+                    /**
+                     * ***Update the Information Label *******
+                     */
+                    totalUserCount++;
+                    updateInformationLabel();
+
+                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                }
+
+                /**
+                 * *********Leave Room RFC *********
+                 */
+                if (serverData.startsWith("LERO")) {
+                    splitString = serverData.substring(5, serverData.indexOf("~"));
+                    userListModel.removeElement(splitString);//)tapPanel.userCanvas.removeListItem(splitString);
+                    messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
+
+                    /**
+                     * ***Update the Information Label *******
+                     */
+                    totalUserCount--;
+                    updateInformationLabel();
+                }
+
+                /**
+                 * ******** Room Count RFC *******
+                 */
+                if (serverData.startsWith("ROCO")) {
+                    splitString = serverData.substring(5, serverData.indexOf("~"));
+                    txtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
+                }
+
+                /**
+                 * ***** Private Message RFC *********
+                 */
+                if (serverData.startsWith("PRIV")) {
+                    splitString = serverData.substring(5, serverData.indexOf(":"));
+                    /**
+                     * ** Check whether ignored user ********
+                     */
+                    if (!(tapPanel.userCanvas.isIgnoredUser(splitString))) {
+                        boolean PrivateFlag = false;
+                        for (count = 0; count < privateWindowCount; count++) {
+                            if (privateWindows[count].userName.equals(splitString)) {
+                                privateWindows[count].addMessageToMessageCanvas(serverData.substring(5));
+                                privateWindows[count].setVisible(true);
+                                privateWindows[count].requestFocus();
+                                PrivateFlag = true;
+                                break;
+                            }
+                        }
+
+                        if (!(PrivateFlag)) {
+                            if (privateWindowCount >= MAX_PRIVATE_WINDOW) {
+                                messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
+                            } else {
+                                privateWindows[privateWindowCount++] = new PrivateChat(this, splitString);
+                                privateWindows[privateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
+                                privateWindows[privateWindowCount - 1].setVisible(true);
+                                privateWindows[privateWindowCount - 1].requestFocus();
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
+                quitConnection(QUIT_TYPE_DEFAULT);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * ********Setting the appletStatus*******
+     */
+    private void setAppletStatus(String Message) {
+        if (messageCanvas != null) {
+            messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
+        }
+    }
+
+    /**
+     * *******Function To Update the Information Label****
+     */
+    private void updateInformationLabel() {
+        stringBuffer = new StringBuffer();
+        stringBuffer.append("User Name: ");
+        stringBuffer.append(userName);
+        stringBuffer.append("       ");
+        stringBuffer.append("Room Name: ");
+        stringBuffer.append(userRoom);
+        stringBuffer.append("       ");
+        stringBuffer.append("No. Of Users: ");
+        stringBuffer.append(totalUserCount);
+        stringBuffer.append("       ");
+        informationLabel.setText(stringBuffer.toString());
+    }
+
+    /**
+     * *** Function To Disable All Components *******
+     */
+    private void disableAll() {
+        textMessage.setEnabled(false);
+        btnSend.setEnabled(false);
+        tapPanel.setEnabled(false);
+        disconnectItem.setEnabled(false);
+        loginItem.setEnabled(true);
+        userName = "";
+        userRoom = "";
+        totalUserCount = 0;
+    }
+
+    /**
+     * *** Function To Enable All Components *******
+     */
+    private void enableAll() {
+        textMessage.setEnabled(true);
+        btnSend.setEnabled(true);
+        tapPanel.setEnabled(true);
+        disconnectItem.setEnabled(true);
+        loginItem.setEnabled(false);
+    }
+
+    /**
+     * *****Disconnect Chat *******
+     */
+    private void disconnectChat() {
+        if (socket != null) {
+            messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
+            quitConnection(QUIT_TYPE_DEFAULT);
+        }
+    }
+
+    /**
+     * *** Enable the Private Chat when the End User logged out***
+     */
+    private void enablePrivateWindow(String ToUserName) {
+        for (count = 0; count < privateWindowCount; count++) {
+            if (privateWindows[count].userName.equals(ToUserName)) {
+                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].enableAll();
+                return;
+            }
+        }
+    }
+
+    /**
+     * *** Disable the Private Chat when the End User logged out***
+     */
+    private void removeUserFromPrivateChat(String ToUserName) {
+        for (count = 0; count < privateWindowCount; count++) {
+            if (privateWindows[count].userName.equals(ToUserName)) {
+                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].disableAll();
+                return;
+            }
+        }
+    }
+
+    /**
+     * *****Function To Send Private Message To Server **********
+     */
+    protected void sentPrivateMessageToServer(String Message, String ToUserName) {
+        sendMessageToServer("PRIV " + ToUserName + "~"
+                + userName + ": " + Message);
+    }
+
+    /**
+     * ***** Function To Remove Private Window **************
+     */
+    protected void removePrivateWindow(String ToUserName) {
+        int m_UserIndex = 0;
+        for (count = 0; count < privateWindowCount; count++) {
+            m_UserIndex++;
+            if (privateWindows[count].userName.equals(ToUserName)) {
+                break;
+            }
+        }
+        for (int m_iLoop = m_UserIndex; m_iLoop < privateWindowCount; m_iLoop++) {
+            privateWindows[m_iLoop] = privateWindows[m_iLoop + 1];
+        }
+
+        privateWindowCount--;
+    }
+
+    /**
+     * ******* Function to Change Room ******
+     */
+    protected void changeRoom() {
+        int index = roomCanvas.getSelectedIndex();    
+        String user = roomListModel.get(index);
+        if (user.equals("")) {
+            messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+
+        if (user.equals(userRoom)) {
+            messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+
+        sendMessageToServer("CHRO " + userName + "~" + user);
+    }
+
+    /**
+     * ***** Function to Send a RFC for Get a Room User Count *******
+     */
+    protected void getRoomUserCount(String RoomName) {
+        sendMessageToServer("ROCO " + RoomName);
+    }
+
+    /**
+     * ****** Function to Set the Image Name into Text Field ***********
+     */
+    protected void addImageToTextField(String imageName) {
+        if (textMessage.getText() == null || textMessage.getText().equals("")) {
+            textMessage.setText("~~" + imageName + " ");
+        } else {
+            textMessage.setText(textMessage.getText() + " "
+                    + "~~" + imageName + " ");
+        }
+    }
+
     private void connectToServer() {
         /**
          * *********Initialize the Socket******
          */
-        messageCanvas.setText("");//clearAll();
-        messageCanvas.setText(messageCanvas.getText() + "Connecting To Server... Please Wait...");
-        //messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...",MESSAGE_TYPE_ADMIN);
+        messageCanvas.ClearAll();
+        messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...", MESSAGE_TYPE_ADMIN);
+        /**
+         * *********Initialize the Socket******
+         */
         try {
             if (isProxy) {
                 /**
                  * *******Proxy**********
                  */
-                SocksSocketImplFactory factory = new SocksSocketImplFactory(proxyHost, ProxyPort);
+                SocksSocketImplFactory factory
+                        = new SocksSocketImplFactory(proxyHost, proxyPort);
                 SocksSocket.setSocketImplFactory(factory);
-                socket = new SocksSocket(serverName, ServerPort);
+                socket = new SocksSocket(serverName, serverPort);
                 socket.setSoTimeout(0);
             } else {
                 /**
                  * *****Not Proxy********
                  */
-                socket = new Socket(serverName, ServerPort);
+                socket = new Socket(serverName, serverPort);
             }
-            dataoutputstream = new DataOutputStream(socket.getOutputStream());
+            out = new DataOutputStream(socket.getOutputStream());
             sendMessageToServer("HELO " + userName);
-            datainputstream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            //datainputstream  = new DataInputStream(socket.getInputStream());
-
+//            in = new DataInputStream(socket.getInputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             /**
              * *********Send HELO To Server *********
              */
@@ -377,307 +881,29 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
         }
     }
 
-    private void sendMessageToServer(String Message) {
+    /**
+     * ****** Function To Send MESS RFC to Server ************
+     */
+    private void sendMessage() {
+        /**
+         * ******Sending a Message To Server ********
+         */
+        sendMessageToServer("MESS " + userRoom + "~" + userName + ": "
+                + textMessage.getText());
+        appendToPane(messageCanvas, "<span>"+userName + ": " + textMessage.getText() + "...</span>");
+        textMessage.setText("");
+        textMessage.requestFocus();
+    }
+
+    // send html to pane
+    private void appendToPane(JTextPane tp, String msg) {
+        HTMLDocument doc = (HTMLDocument) tp.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
         try {
-            dataoutputstream.writeBytes(Message + "\r\n");
-        } catch (IOException ie) {
-            quitConnection(QUIT_TYPE_DEFAULT);
-            ie.printStackTrace();
+            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+            tp.setCaretPosition(doc.getLength());
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
         }
-    }
-
-    private void quitConnection(int quitType) {
-        if (socket != null) {
-            try {
-                if (quitType == QUIT_TYPE_DEFAULT) {
-                    sendMessageToServer("QUIT " + userName + "~" + userRoom);
-                }
-                if (quitType == QUIT_TYPE_KICK) {
-                    sendMessageToServer("KICK " + userName + "~" + userRoom);
-                }
-                socket.close();
-                socket = null;
-                tappanel.UserCanvas.clearAll();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (thread != null) {
-            thread.interrupt();	//thread.stop();
-            thread = null;
-        }
-        disableAll();
-        startFlag = false;
-        //   setAppletStatus("ADMIN: CONNECTION TO THE SERVER CLOSED.");
-    }
-
-    /**
-     * Function To Disable All Components
-     */
-    private void disableAll() {
-        textMessage.setEnabled(false);
-        btnSend.setEnabled(false);
-        tappanel.setEnabled(false);//enable(false);
-        disconnectItem.setEnabled(false);
-        loginItem.setEnabled(true);
-
-        userName = "";
-        userRoom = "";
-        totalUserCount = 0;
-    }
-
-    /**
-     * Function To Enable All Components
-     */
-    private void enableAll() {
-        textMessage.setEnabled(true);
-        btnSend.setEnabled(true);
-        tappanel.setEnabled(true);
-        disconnectItem.setEnabled(true);
-        loginItem.setEnabled(false);
-    }
-
-    int ServerPort, ProxyPort, iconCount, totalUserCount;
-    protected int privateWindowCount;
-    private int g_ILoop;
-    String userName, userRoom, serverName, appletStatus, chatLogo, bannerName, proxyHost, serverData, roomList, splitString;
-    StringBuffer stringbuffer;
-    Image imgLogo, imgBanner;
-    boolean startFlag, isProxy;
-    Socket socket;
-    BufferedReader datainputstream;//DataInputStream datainputstream;
-    DataOutputStream dataoutputstream;
-    MediaTracker tracker;
-    Image[] iconArray; //Icon[] iconArray;
-    Thread thread;
-    StringTokenizer tokenizer;
-    TapPanel tappanel;
-    Font textFont;
-    protected PrivateChat[] privateWindow;
-    InformationDialog dialog;
-
-    @Override
-    public void run() {
-//        while (thread != null) {
-//            try {
-//                serverData = datainputstream.readLine();
-//                String RFCinitial = serverData.substring(0, 4);
-//                switch (RFCinitial) {
-//                    /**
-//                     * LIST UserName;UserName; RFC Coding
-//                     */
-//                    case "LIST":
-//                        tokenizer = new StringTokenizer(serverData.substring(5), ";");
-//                        /**
-//                         * Update the Information Label
-//                         */
-//                        totalUserCount = tokenizer.countTokens();
-//                        updateInformationLabel();
-//                        /**
-//                         * ********Add User Item into User Canvas ********
-//                         */
-//                        tappanel.userCanvas.clearAll();
-//                        while (tokenizer.hasMoreTokens()) {
-//                            tappanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
-//                        }
-//                        messageCanvas.clearAll();
-//                        messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
-//                        break;
-//                    /**
-//                     * Room Rfc
-//                     */
-//                    case "ROOM":
-//                        /**
-//                         * ******** Loading Room List in to Room Canvas *************
-//                         */
-//                        tokenizer = new StringTokenizer(serverData.substring(5), ";");
-//                        userRoom = tokenizer.nextToken();
-//                        updateInformationLabel();
-//                        /**
-//                         * ********Add User Item into User Canvas ********
-//                         */
-//                        tappanel.roomCanvas.clearAll();
-//                        tappanel.roomCanvas.addListItemToMessageObject(userRoom);
-//                        while (tokenizer.hasMoreTokens()) {
-//                            tappanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
-//                        }
-//                        break;
-//                    /**
-//                     * ADD RFC
-//                     */
-//                    case "ADD":
-//                        /**
-//                         * Update the Information Label
-//                         */
-//                        totalUserCount++;
-//                        updateInformationLabel();
-//
-//                        /**
-//                         * Add User Item into User Canvas
-//                         */
-//                        splitString = serverData.substring(5);
-//                        enablePrivateWindow(splitString);
-//                        tappanel.userCanvas.addListItemToMessageObject(splitString);
-//                        messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
-//                        break;
-//                    /**
-//                     * If User Name Already Exists
-//                     */
-//                    case "EXIS":
-//                        messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
-//                        thread = null;
-//                        quitConnection(QUIT_TYPE_NULL);
-//                        break;
-//                    /**
-//                     * REMOVE User RFC Coding
-//                     */
-//                    case "REMO":
-//                        splitString = serverData.substring(5);
-//
-//                        tappanel.userCanvas.removeListItem(splitString);
-//                        removeUserFromPrivateChat(splitString);
-//                        messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
-//
-//                        /**
-//                         * Update the Information Label
-//                         */
-//                        totalUserCount--;
-//                        updateInformationLabel();
-//                        break;
-//                    /**
-//                     * MESS RFC Coding Starts
-//                     */
-//                    case "MESS":
-//                        /**
-//                         * ** Chk whether ignored user ********
-//                         */
-//                        if (!(tappanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
-//                            messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
-//                        }
-//                        break;
-//                    /**
-//                     * KICK RFC Starts
-//                     */
-//                    case "KICK":
-//                        messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
-//                        thread = null;
-//                        quitConnection(QUIT_TYPE_KICK);
-//                        break;
-//                    /**
-//                     * INKI RFC (Information about kicked off User
-//                     */
-//                    case "INKI":
-//                        splitString = serverData.substring(5);
-//                        tappanel.userCanvas.removeListItem(splitString);
-//                        removeUserFromPrivateChat(splitString);
-//                        messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
-//
-//                        /**
-//                         * Update the Information Label
-//                         */
-//                        totalUserCount--;
-//                        updateInformationLabel();
-//                        break;
-//                    /**
-//                     * Change Room RFC
-//                     */
-//                    case "CHRO":
-//                        userRoom = serverData.substring(5);
-//                        break;
-//                    /**
-//                     * Join Room RFC
-//                     */
-//                    case "JORO":
-//                        splitString = serverData.substring(5);
-//                        tappanel.userCanvas.addListItemToMessageObject(splitString);
-//                        /**
-//                         * Update the Information Label
-//                         */
-//                        totalUserCount++;
-//                        updateInformationLabel();
-//
-//                        messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
-//                        break;
-//                    /**
-//                     * Leave Room RFC
-//                     */
-//                    case "LERO":
-//                        splitString = serverData.substring(5, serverData.indexOf("~"));
-//                        tappanel.userCanvas.removeListItem(splitString);
-//                        messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
-//
-//                        /*
-//                     *	Update the Information Label
-//                         */
-//                        totalUserCount--;
-//                        updateInformationLabel();
-//                        break;
-//                    /**
-//                     * Room Count RFC
-//                     */
-//                    case "ROCO":
-//                        splitString = serverData.substring(5, serverData.indexOf("~"));
-//                        tappanel.txtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
-//                        break;
-//                    /**
-//                     * Private Message RFC
-//                     */
-//                    case "PRIV":
-//                        splitString = serverData.substring(5, serverData.indexOf(":"));
-//                        /**
-//                         * Check whether ignored user
-//                         */
-//                        if (!(tappanel.userCanvas.isIgnoredUser(splitString))) {
-//                            boolean PrivateFlag = false;
-//
-//                            for (g_ILoop = 0; g_ILoop < privateWindowCount; g_ILoop++) {
-//                                if (privateWindow[g_ILoop].userName.equals(splitString)) {
-//                                    privateWindow[g_ILoop].addMessageToMessageCanvas(serverData.substring(5));
-//                                    privateWindow[g_ILoop].setVisible(true);
-//                                    privateWindow[g_ILoop].requestFocus();
-//                                    PrivateFlag = true;
-//                                    break;
-//                                }
-//                            }
-//
-//                            if (!(PrivateFlag)) {
-//                                if (privateWindowCount >= MAX_PRIVATE_WINDOW) {
-//                                    messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
-//                                } else {
-//                                    privateWindow[privateWindowCount++] = new PrivateChat(this, splitString);
-//                                    privateWindow[privateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
-//                                    privateWindow[privateWindowCount - 1].setVisible(true);
-//                                    privateWindow[privateWindowCount - 1].requestFocus();
-//                                }
-//                            }
-//                        }
-//                        break;
-//                }
-//            } catch (Exception e) {
-//                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
-//                quitConnection(QUIT_TYPE_DEFAULT);
-//            }
-//        }
-    }
-
-    /**
-     * Function To Update the Information Label
-     */
-    public void addMessageToMessageObject() {
-
-    }
-
-    private void updateInformationLabel() {
-        stringbuffer = new StringBuffer();
-        stringbuffer.append("User Name: ");
-        stringbuffer.append(userName);
-        stringbuffer.append("       ");
-        stringbuffer.append("Room Name: ");
-        stringbuffer.append(userRoom);
-        stringbuffer.append("       ");
-        stringbuffer.append("No. Of Users: ");
-        stringbuffer.append(totalUserCount);
-        stringbuffer.append("       ");
-        informationLabel.setText(stringbuffer.toString());
     }
 }

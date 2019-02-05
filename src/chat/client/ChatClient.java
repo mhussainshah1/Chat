@@ -301,7 +301,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 }
                 socket.close();
                 socket = null;
-                tapPanel.UserCanvas.clearAll();
+                tapPanel.userCanvas.clearAll();
             } catch (IOException ie) {
                 ie.printStackTrace();
             }
@@ -336,9 +336,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.UserCanvas.clearAll();
+                    tapPanel.userCanvas.clearAll();
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.UserCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
                     messageCanvas.ClearAll();
@@ -359,10 +359,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.RoomCanvas.clearAll();
-                    tapPanel.RoomCanvas.addListItemToMessageObject(userRoom);
+                    tapPanel.roomCanvas.clearAll();
+                    tapPanel.roomCanvas.addListItemToMessageObject(userRoom);
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.RoomCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                        tapPanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
                 }
 
@@ -381,7 +381,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                      */
                     splitString = serverData.substring(5);
                     enablePrivateWindow(splitString);
-                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
+                    tapPanel.userCanvas.addListItemToMessageObject(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
@@ -400,7 +400,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 if (serverData.startsWith("REMO")) {
                     splitString = serverData.substring(5);
 
-                    tapPanel.UserCanvas.removeListItem(splitString);
+                    tapPanel.userCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 
@@ -419,7 +419,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ** Chk whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                    if (!(tapPanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
                         messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
                 }
@@ -438,7 +438,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("INKI")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.removeListItem(splitString);
+                    tapPanel.userCanvas.removeListItem(splitString);
                     removeUserFromPrivateChat(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 
@@ -461,7 +461,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("JORO")) {
                     splitString = serverData.substring(5);
-                    tapPanel.UserCanvas.addListItemToMessageObject(splitString);
+                    tapPanel.userCanvas.addListItemToMessageObject(splitString);
                     /**
                      * ***Update the Information Label *******
                      */
@@ -476,7 +476,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("LERO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.UserCanvas.removeListItem(splitString);
+                    tapPanel.userCanvas.removeListItem(splitString);
                     messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 
                     /**
@@ -491,7 +491,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("ROCO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.TxtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
+                    tapPanel.txtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
                 }
 
                 /**
@@ -502,7 +502,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.UserCanvas.isIgnoredUser(splitString))) {
+                    if (!(tapPanel.userCanvas.isIgnoredUser(splitString))) {
                         boolean PrivateFlag = false;
                         for (count = 0; count < privateWindowCount; count++) {
                             if (privateWindows[count].userName.equals(splitString)) {
@@ -586,14 +586,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     public void keyReleased(KeyEvent e) {
     }
 
-    /**
-     * ********Setting the appletStatus*******
-     */
-    private void setAppletStatus(String Message) {
-        if (messageCanvas != null) {
-            messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
-        }
-    }
+    //Getter and Setter Methods
 
     public TapPanel getTapPanel() {
         return tapPanel;
@@ -605,9 +598,30 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
 
     public String getUserName() {
         return userName;
+    }   
+
+    public MessageCanvas getMessageCanvas() {
+        return messageCanvas;
     }
 
+    public int getIconCount() {
+        return iconCount;
+    }
+
+    public Image getIcon(int index) {
+        return iconArray[index];
+    }
+    
     /**
+     * ********Setting the appletStatus*******
+     */
+    private void setAppletStatus(String Message) {
+        if (messageCanvas != null) {
+            messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
+        }
+    }
+
+     /**
      * *******Function To Update the Information Label****
      */
     private void updateInformationLabel() {
@@ -623,19 +637,6 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         stringBuffer.append("       ");
         informationLabel.setText(stringBuffer.toString());
     }
-
-    public MessageCanvas getMessageCanvas() {
-        return messageCanvas;
-    }
-
-    public int getIconCount() {
-        return iconCount;
-    }
-
-    public Image getIcon(int index) {
-        return iconArray[index];
-    }
-
     /**
      * *** Function To Disable All Components *******
      */
@@ -727,18 +728,18 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * ******* Function to Change Room ******
      */
     protected void changeRoom() {
-        if (tapPanel.RoomCanvas.selectedUser.equals("")) {
+        if (tapPanel.roomCanvas.selectedUser.equals("")) {
             messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        if (tapPanel.RoomCanvas.selectedUser.equals(userRoom)) {
+        if (tapPanel.roomCanvas.selectedUser.equals(userRoom)) {
             messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
         sendMessageToServer("CHRO " + userName + "~"
-                + tapPanel.RoomCanvas.selectedUser);
+                + tapPanel.roomCanvas.selectedUser);
     }
 
     /**

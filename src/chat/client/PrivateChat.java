@@ -163,12 +163,12 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
          */
         if (evt.getSource().equals(cmdIgnore)) {
             if (evt.getActionCommand().equals("Ignore User")) {
-                chatClient.getTapPanel().UserCanvas.ignoreUser(true, userName);
+                chatClient.getTapPanel().userCanvas.ignoreUser(true, userName);
                 messageCanvas.addMessageToMessageObject(userName + " has been ignored!", MESSAGE_TYPE_ADMIN);
                 cmdIgnore.setLabel("Allow User");
             } else {
                 messageCanvas.addMessageToMessageObject(userName + " has been removed from ignored list!", MESSAGE_TYPE_ADMIN);
-                chatClient.getTapPanel().UserCanvas.ignoreUser(false, userName);
+                chatClient.getTapPanel().userCanvas.ignoreUser(false, userName);
                 cmdIgnore.setLabel("Ignore User");
             }
         }

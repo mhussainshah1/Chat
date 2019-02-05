@@ -6,11 +6,11 @@ import java.awt.event.*;
 public class TapPanel extends Panel implements CommonSettings, ActionListener {
 
     ChatClient chatclient;
-    protected TextField TxtUserCount;
+    protected TextField txtUserCount;
     ScrollView ImageScrollView, UserScrollView, RoomScrollView;
-    protected ImageCanvas imagecanvas;
-    protected ListViewCanvas UserCanvas, RoomCanvas;
-    Button CmdChangeRoom, CmdIgnoreUser, CmdSendDirect;
+    protected ImageCanvas imageCanvas;
+    protected ListViewCanvas userCanvas, roomCanvas;
+    Button cmdChangeRoom, cmdIgnoreUser, cmdSendDirect;
 
     TapPanel(ChatClient parent) {
         /**
@@ -26,59 +26,59 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
          * *****User Panel Coding Starts**********
          */
         Panel UserPanel = new Panel(new BorderLayout());
-        UserCanvas = new ListViewCanvas(chatclient, USER_CANVAS);
+        userCanvas = new ListViewCanvas(chatclient, USER_CANVAS);
 
-        UserScrollView = new ScrollView(UserCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        UserCanvas.scrollView = UserScrollView;
-        UserPanel.add("Center", UserScrollView);
+        UserScrollView = new ScrollView(userCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+        userCanvas.scrollView = UserScrollView;
+        UserPanel.add(BorderLayout.CENTER, UserScrollView);
 
         Panel UserButtonPanel = new Panel(new BorderLayout());
-        CmdSendDirect = new CustomButton(chatclient, "Send Direct Message");
-        CmdSendDirect.addActionListener(this);
-        UserButtonPanel.add("North", CmdSendDirect);
-        CmdIgnoreUser = new CustomButton(chatclient, "Ignore User");
-        CmdIgnoreUser.addActionListener(this);
-        UserButtonPanel.add("Center", CmdIgnoreUser);
-        UserPanel.add("South", UserButtonPanel);
+        cmdSendDirect = new CustomButton(chatclient, "Send Direct Message");
+        cmdSendDirect.addActionListener(this);
+        UserButtonPanel.add(BorderLayout.NORTH, cmdSendDirect);
+        cmdIgnoreUser = new CustomButton(chatclient, "Ignore User");
+        cmdIgnoreUser.addActionListener(this);
+        UserButtonPanel.add(BorderLayout.CENTER, cmdIgnoreUser);
+        UserPanel.add(BorderLayout.SOUTH, UserButtonPanel);
 
         /**
          * ******Room Panel Coding Starts**********
          */
         Panel RoomPanel = new Panel(new BorderLayout());
-        RoomCanvas = new ListViewCanvas(chatclient, ROOM_CANVAS);
+        roomCanvas = new ListViewCanvas(chatclient, ROOM_CANVAS);
 
-        RoomScrollView = new ScrollView(RoomCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        RoomCanvas.scrollView = RoomScrollView;
-        RoomPanel.add("Center", RoomScrollView);
+        RoomScrollView = new ScrollView(roomCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+        roomCanvas.scrollView = RoomScrollView;
+        RoomPanel.add(BorderLayout.CENTER, RoomScrollView);
 
         Panel RoomButtonPanel = new Panel(new BorderLayout());
         Panel RoomCountPanel = new Panel(new BorderLayout());
         Label LblCaption = new Label("ROOM COUNT", 1);
-        RoomCountPanel.add("North", LblCaption);
-        TxtUserCount = new TextField();
-        TxtUserCount.setEditable(false);
-        RoomCountPanel.add("Center", TxtUserCount);
-        RoomButtonPanel.add("Center", RoomCountPanel);
+        RoomCountPanel.add(BorderLayout.NORTH, LblCaption);
+        txtUserCount = new TextField();
+        txtUserCount.setEditable(false);
+        RoomCountPanel.add(BorderLayout.CENTER, txtUserCount);
+        RoomButtonPanel.add(BorderLayout.CENTER, RoomCountPanel);
 
-        CmdChangeRoom = new CustomButton(chatclient, "Change Room");
-        CmdChangeRoom.addActionListener(this);
-        RoomButtonPanel.add("South", CmdChangeRoom);
+        cmdChangeRoom = new CustomButton(chatclient, "Change Room");
+        cmdChangeRoom.addActionListener(this);
+        RoomButtonPanel.add(BorderLayout.SOUTH, cmdChangeRoom);
 
-        RoomPanel.add("South", RoomButtonPanel);
+        RoomPanel.add(BorderLayout.SOUTH, RoomButtonPanel);
 
         /**
          * ******Image Panel Coding Starts**********
          */
         Panel ImagePanel = new Panel(new BorderLayout());
 
-        imagecanvas = new ImageCanvas(chatclient);
-        ImageScrollView = new ScrollView(imagecanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        imagecanvas.scrollview = ImageScrollView;
+        imageCanvas = new ImageCanvas(chatclient);
+        ImageScrollView = new ScrollView(imageCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+        imageCanvas.scrollview = ImageScrollView;
         /**
          * ********Add Icons into MessageObject ********
          */
-        imagecanvas.AddIconsToMessageObject();
-        ImagePanel.add("Center", ImageScrollView);
+        imageCanvas.AddIconsToMessageObject();
+        ImagePanel.add(BorderLayout.CENTER, ImageScrollView);
 
         /**
          * *******Add All the Panel in to Main Panel********
@@ -105,23 +105,23 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
      * *********Action Listener coding *********
      */
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource().equals(CmdChangeRoom)) {
+        if (evt.getSource().equals(cmdChangeRoom)) {
             /**
              * ****** Change Room Coding ********
              */
             chatclient.changeRoom();
         }
 
-        if (evt.getSource().equals(CmdIgnoreUser)) {
+        if (evt.getSource().equals(cmdIgnoreUser)) {
             if (evt.getActionCommand().equals("Ignore User")) {
-                UserCanvas.IgnoreUser(true);
+                userCanvas.IgnoreUser(true);
             } else {
-                UserCanvas.IgnoreUser(false);
+                userCanvas.IgnoreUser(false);
             }
         }
 
-        if (evt.getSource().equals(CmdSendDirect)) {
-            UserCanvas.SendDirectMessage();
+        if (evt.getSource().equals(cmdSendDirect)) {
+            userCanvas.SendDirectMessage();
         }
     }
 }

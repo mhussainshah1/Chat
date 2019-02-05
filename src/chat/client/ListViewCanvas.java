@@ -89,10 +89,10 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
             listArray.set(m_listIndex, messageObject);
 
             if (IsIgnore) {
-                chatClient.getTapPanel().CmdIgnoreUser.setLabel("Allow User");
+                chatClient.getTapPanel().cmdIgnoreUser.setLabel("Allow User");
                 chatClient.getMessageCanvas().addMessageToMessageObject(IgnoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
             } else {
-                chatClient.getTapPanel().CmdIgnoreUser.setLabel("Ignore User");
+                chatClient.getTapPanel().cmdIgnoreUser.setLabel("Ignore User");
                 chatClient.getMessageCanvas().addMessageToMessageObject(IgnoreUserName + " has been romoved from ignored list!", MESSAGE_TYPE_JOIN);
             }
         }
@@ -228,8 +228,8 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         int CurrentY = j + yOffset;
         int m_listArraySize = listArray.size();
         boolean SelectedFlag = false;
-        chatClient.getTapPanel().TxtUserCount.setText("");
-        chatClient.getTapPanel().CmdIgnoreUser.setLabel("Ignore User");
+        chatClient.getTapPanel().txtUserCount.setText("");
+        chatClient.getTapPanel().cmdIgnoreUser.setLabel("Ignore User");
         for (count = 0; count < m_listArraySize; count++) {
             messageObject = listArray.get(count);
             if ((CurrentY >= messageObject.startY) && (CurrentY <= (messageObject.startY + DEFAULT_LIST_CANVAS_HEIGHT))) {
@@ -243,9 +243,9 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
 
                 if (canvasType == USER_CANVAS) {
                     if (isIgnoredUser(selectedUser)) {
-                        chatClient.getTapPanel().CmdIgnoreUser.setLabel("Allow User");
+                        chatClient.getTapPanel().cmdIgnoreUser.setLabel("Allow User");
                     } else {
-                        chatClient.getTapPanel().CmdIgnoreUser.setLabel("Ignore User");
+                        chatClient.getTapPanel().cmdIgnoreUser.setLabel("Ignore User");
                     }
                 }
             } else {
