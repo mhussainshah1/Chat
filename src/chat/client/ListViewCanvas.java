@@ -142,7 +142,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         }
 
         /**
-         * **By Fefault***
+         * **By Default***
          */
         return false;
 
