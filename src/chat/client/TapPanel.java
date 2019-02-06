@@ -114,9 +114,9 @@ public class TapPanel extends Panel implements CommonSettings, ActionListener {
 
         if (evt.getSource().equals(cmdIgnoreUser)) {
             if (evt.getActionCommand().equals("Ignore User")) {
-                userCanvas.IgnoreUser(true);
+                userCanvas.ignoreUser(true);
             } else {
-                userCanvas.IgnoreUser(false);
+                userCanvas.ignoreUser(false);
             }
         }
 

@@ -68,11 +68,11 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
     /**
      * ******Function To Get the Index of Give message from List Array ********
      */
-    private int getIndexOf(String Message) {
+    private int getIndexOf(String message) {
         int m_listSize = listArray.size();
         for (count = 0; count < m_listSize; count++) {
             messageObject = listArray.get(count);
-            if (messageObject.message.equals(Message)) {
+            if (messageObject.message.equals(message)) {
                 return count;
             }
         }
@@ -81,19 +81,19 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
 
     }
 
-    protected void ignoreUser(boolean IsIgnore, String IgnoreUserName) {
-        int m_listIndex = getIndexOf(IgnoreUserName);
+    protected void ignoreUser(boolean isIgnore, String ignoreUserName) {
+        int m_listIndex = getIndexOf(ignoreUserName);
         if (m_listIndex >= 0) {
             messageObject = listArray.get(m_listIndex);
-            messageObject.isIgnored = IsIgnore;
+            messageObject.isIgnored = isIgnore;
             listArray.set(m_listIndex, messageObject);
 
-            if (IsIgnore) {
+            if (isIgnore) {
                 chatClient.getTapPanel().cmdIgnoreUser.setLabel("Allow User");
-                chatClient.getMessageCanvas().addMessageToMessageObject(IgnoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
+                chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
             } else {
                 chatClient.getTapPanel().cmdIgnoreUser.setLabel("Ignore User");
-                chatClient.getMessageCanvas().addMessageToMessageObject(IgnoreUserName + " has been romoved from ignored list!", MESSAGE_TYPE_JOIN);
+                chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been romoved from ignored list!", MESSAGE_TYPE_JOIN);
             }
         }
     }
@@ -102,7 +102,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
      * ********Set or Remove Ignore List from Array *******
      * @param isIgnore
      */
-    protected void IgnoreUser(boolean isIgnore) {
+    protected void ignoreUser(boolean isIgnore) {
         if (selectedUser.equals("")) {
             chatClient.getMessageCanvas().addMessageToMessageObject("Invalid User Selection!", MESSAGE_TYPE_ADMIN);
             return;

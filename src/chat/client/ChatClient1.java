@@ -3,7 +3,6 @@ package chat.client;
 import static chat.client.CommonSettings.*;
 import chat.client.net.SocksSocket;
 import chat.client.net.SocksSocketImplFactory;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
@@ -161,30 +160,10 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         topPanel.setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout logoPanelLayout = new javax.swing.GroupLayout(logoPanel);
-        logoPanel.setLayout(logoPanelLayout);
-        logoPanelLayout.setHorizontalGroup(
-            logoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 852, Short.MAX_VALUE)
-        );
-        logoPanelLayout.setVerticalGroup(
-            logoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 132, Short.MAX_VALUE)
-        );
-
+        logoPanel.setLayout(new java.awt.BorderLayout());
         topPanel.add(logoPanel, java.awt.BorderLayout.EAST);
 
-        javax.swing.GroupLayout bannerPanelLayout = new javax.swing.GroupLayout(bannerPanel);
-        bannerPanel.setLayout(bannerPanelLayout);
-        bannerPanelLayout.setHorizontalGroup(
-            bannerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 852, Short.MAX_VALUE)
-        );
-        bannerPanelLayout.setVerticalGroup(
-            bannerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 132, Short.MAX_VALUE)
-        );
-
+        bannerPanel.setLayout(new java.awt.BorderLayout());
         topPanel.add(bannerPanel, java.awt.BorderLayout.WEST);
 
         getContentPane().add(topPanel, java.awt.BorderLayout.PAGE_START);
@@ -256,11 +235,6 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
 
         roomPanel.setLayout(new java.awt.BorderLayout());
 
-        roomCanvas.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         roomScrollPane.setViewportView(roomCanvas);
 
         roomPanel.add(roomScrollPane, java.awt.BorderLayout.CENTER);
@@ -574,7 +548,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     /**
                      * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                    if (!(isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
                         appendToPane(messageCanvas, "<span>"+serverData.substring(5)+"</span>");
 //                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
@@ -666,7 +640,7 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
                     /**
                      * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.userCanvas.isIgnoredUser(splitString))) {
+                    if (!(isIgnoredUser(splitString))) {
                         boolean PrivateFlag = false;
                         for (count = 0; count < privateWindowCount; count++) {
                             if (privateWindows[count].userName.equals(splitString)) {
@@ -792,9 +766,9 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
     /**
      * *****Function To Send Private Message To Server **********
      */
-    protected void sentPrivateMessageToServer(String Message, String ToUserName) {
-        sendMessageToServer("PRIV " + ToUserName + "~"
-                + userName + ": " + Message);
+    protected void sentPrivateMessageToServer(String message, String toUserName) {
+        sendMessageToServer("PRIV " + toUserName + "~"
+                + userName + ": " + message);
     }
 
     /**
@@ -923,4 +897,63 @@ public class ChatClient1 extends javax.swing.JFrame implements Runnable {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * ********Set or Remove Ignore List from Array *******
+     * @param isIgnore
+     */
+    protected void ignoreUser(boolean isIgnore) {
+        if (selectedUser.equals("")) {
+            appendToPane(messageCanvas, "<span>Invalid User Selection!</span>");
+            //chatClient.getMessageCanvas().addMessageToMessageObject("Invalid User Selection!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+        if (selectedUser.equals(userName)) {
+            appendToPane(messageCanvas, "<span>You can not ignored yourself!</span>");
+            //chatClient.getMessageCanvas().addMessageToMessageObject("You can not ignored yourself!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+
+        ignoreUser(isIgnore, selectedUser);
+
+    }
+    
+    protected void ignoreUser(boolean isIgnore, String ignoreUserName) {
+        int m_listIndex = getIndexOf(ignoreUserName);
+        if (m_listIndex >= 0) {
+            messageObject = listArray.get(m_listIndex);
+            messageObject.isIgnored = isIgnore;
+            listArray.set(m_listIndex, messageObject);
+
+            if (isIgnore) {
+                btnIgnoreUser.setText("Allow User");
+                appendToPane(messageCanvas, "<span>"+ignoreUserName + " has been ignored!</span>");
+                //chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
+            } else {
+                btnIgnoreUser.setText("Ignore User");
+                appendToPane(messageCanvas, "<span>"+ignoreUserName + " has been romoved from ignored list!</span>");
+                //chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been romoved from ignored list!", MESSAGE_TYPE_JOIN);
+            }
+        }
+    }
+    
+    /**
+     * ******** Check Whether the User ignored or not ********
+     * @param userName
+     * @return 
+     */
+    protected boolean isIgnoredUser(String userName) {
+        int m_listIndex = userCanvas.getIndexOf(userName);
+        if (m_listIndex >= 0) {
+            messageObject = listArray.get(m_listIndex);
+            return messageObject.isIgnored;
+        }
+
+        /**
+         * **By Default***
+         */
+        return false;
+
+    }
+    
 }
