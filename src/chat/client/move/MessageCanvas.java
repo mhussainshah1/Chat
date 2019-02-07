@@ -1,4 +1,4 @@
-package chat.client;
+package chat.client.move;
 
 import java.awt.Dimension;
 import java.awt.Canvas;

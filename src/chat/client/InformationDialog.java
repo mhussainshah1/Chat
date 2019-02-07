@@ -2,7 +2,6 @@
 package chat.client;
 
 import static chat.client.CommonSettings.*;
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -10,6 +9,7 @@ import java.util.Formatter;
 import java.util.Properties;
 import java.util.Scanner;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 /**
  *
@@ -20,7 +20,7 @@ public class InformationDialog extends JDialog {
     /**
      * Creates new form InformationDialog1
      */
-    public InformationDialog(Frame parent) {//Change into JFram when chatClient JFrame is done
+    public InformationDialog(JFrame parent) {//Change into JFram when chatClient JFrame is done
         super(parent, PRODUCT_NAME + " - Login", true);
         chatClient = parent;
         setFont(chatClient.getFont());//setFont(chatClient.getTextFont());
@@ -250,5 +250,5 @@ public class InformationDialog extends JDialog {
     private Properties properties;
 
     //Change into JFrame when ChatClient JFrame is done 
-    Frame chatClient;
+    JFrame chatClient;
 }

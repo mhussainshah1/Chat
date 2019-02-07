@@ -1,4 +1,4 @@
-package chat.client;
+package chat.client.move;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -36,17 +36,17 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
         fontmetrics = chatClient.getFontMetrics(chatClient.getFont());
     }
 
-    protected void addListItemToMessageObject(String ListItem) {
+    protected void addListItemToMessageObject(String listItem) {
         int m_startY = DEFAULT_LIST_CANVAS_POSITION;
         if (listArray.size() > 0) {
             messageObject = listArray.get(listArray.size() - 1);
             m_startY = messageObject.startY + DEFAULT_LIST_CANVAS_INCREMENT;
         }
         messageObject = new MessageObject();
-        messageObject.message = ListItem;
+        messageObject.message = listItem;
         messageObject.startY = m_startY;
         messageObject.selected = false;
-        messageObject.width = fontmetrics.stringWidth(ListItem) + DEFAULT_LIST_CANVAS_INCREMENT;
+        messageObject.width = fontmetrics.stringWidth(listItem) + DEFAULT_LIST_CANVAS_INCREMENT;
         listArray.add(messageObject);
         totalWidth = Math.max(totalWidth, messageObject.width);
         scrollView.setValues(totalWidth, m_startY + DEFAULT_LIST_CANVAS_HEIGHT);
@@ -68,15 +68,12 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
     /**
      * ******Function To Get the Index of Give message from List Array ********
      */
-    private int getIndexOf(String message) {
-        int m_listSize = listArray.size();
-        for (count = 0; count < m_listSize; count++) {
-            messageObject = listArray.get(count);
-            if (messageObject.message.equals(message)) {
+    private int getIndexOf(String message) {            
+        for(MessageObject messageObject1: listArray){
+            if (messageObject1.message.equals(message)) {
                 return count;
             }
         }
-
         return -1;
 
     }
@@ -266,7 +263,7 @@ public class ListViewCanvas extends Canvas implements CommonSettings {
 
     private void CreatePrivateWindow() {
         /**
-         * ** Chk whether ignored user ********
+         * ** Check whether ignored user ********
          */
         if (!(isIgnoredUser(selectedUser))) {
             boolean PrivateFlag = false;

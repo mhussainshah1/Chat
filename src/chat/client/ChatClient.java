@@ -1,83 +1,28 @@
 package chat.client;
 
-import chat.client.net.SocksSocketImplFactory;
+import static chat.client.CommonSettings.*;
 import chat.client.net.SocksSocket;
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
+import chat.client.net.SocksSocketImplFactory;
 import java.awt.Image;
-import java.awt.Label;
 import java.awt.MediaTracker;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.TextField;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
-/**
- * ********Chat Client*************
- */
-public class ChatClient extends Frame implements Serializable, KeyListener,
-        ActionListener, CommonSettings, Runnable {
+public class ChatClient extends javax.swing.JFrame implements Runnable {
 
-    public static void main(String[] args) {
-        ChatClient cw = new ChatClient();
-    }
-
-    //Frame
-    private Image imgLogo, imgBanner;
-    private Dimension dimension;
-    private MediaTracker tracker;
-    private Label informationLabel;
-    private Image[] iconArray;
-    private MessageCanvas messageCanvas;
-    private ScrollView messageScrollView;
-    private TapPanel tapPanel;
-    private TextField txtMessage;
-    private Button cmdSend, cmdExit;
-    private Font textFont;
-    protected PrivateChat[] privateWindows;
-    protected int count, iconCount, privateWindowCount;
-    private InformationDialog dialog;
-    private Toolkit toolkit;
-    private MenuItem loginItem, disconnectItem, seperatorItem;
-    private MenuItem quitItem, aboutItem;
-    private String chatLogo, bannerName;
-    private StringBuffer stringBuffer;
-    private String appletStatus;
-
-    //For future Network class 
-    private String userName, serverData, roomList, splitString;
-    private String userRoom, serverName, proxyHost;
-    private int serverPort, proxyPort, totalUserCount;
-    private boolean startFlag, isProxy;
-    private Socket socket;
-//    private DataInputStream in;
-    private BufferedReader in;
-    private DataOutputStream out;
-
-    private Thread thread;
-    private StringTokenizer tokenizer;
-
-    ChatClient() {
+    public ChatClient() {
         /**
          * ********Getting all the Parameters**********
          */
@@ -89,70 +34,33 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         bannerName = "images/defaultbanner.gif";
         iconCount = 21;
 
-        toolkit = Toolkit.getDefaultToolkit();
-        if (toolkit.getScreenSize().getWidth() > 778) {
-            setSize(778, 575);
-        } else {
-            setSize((int) toolkit.getScreenSize().getWidth(), (int) toolkit.getScreenSize().getHeight() - 20);
-        }
-        setResizable(false);
-        dimension = getSize();
-        setLayout(new BorderLayout());
-
-        setTitle(PRODUCT_NAME);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent evt) {
-                disconnectChat();
-                System.exit(0);
-            }
-        });
-
         /**
-         * ***Loading menubar **********
+         * variables use with JList
          */
-        MenuBar menuBar = new MenuBar();
-        Menu loginMenu = new Menu("Login");
-        loginItem = new MenuItem("Login");
-        loginItem.addActionListener(this);
-        disconnectItem = new MenuItem("Disconnect");
-        disconnectItem.addActionListener(this);
-        seperatorItem = new MenuItem("-");
-        quitItem = new MenuItem("Quit");
-        quitItem.addActionListener(this);
-        loginMenu.add(loginItem);
-        loginMenu.add(disconnectItem);
-        loginMenu.add(seperatorItem);
-        loginMenu.add(quitItem);
+        listArray = new ArrayList<>();
+        selectedUser = "";
 
-        Menu aboutMenu = new Menu("Help ");
-        aboutItem = new MenuItem("About " + PRODUCT_NAME);
-        aboutItem.addActionListener(this);
-        aboutMenu.add(aboutItem);
-
-        menuBar.add(loginMenu);
-        menuBar.add(aboutMenu);
-        setMenuBar(menuBar);
         /**
          * ********Loading Images********
          */
+        theKit = this.getToolkit();
         tracker = new MediaTracker(this);
-        int ImageCount = 0;
-        imgLogo = toolkit.getImage(chatLogo);
-        tracker.addImage(imgLogo, ImageCount);
-        ImageCount++;
-        imgBanner = toolkit.getImage(bannerName);
-        tracker.addImage(imgBanner, ImageCount);
-        ImageCount++;
+        int imageCount = 0;
+        imgLogo = theKit.getImage(chatLogo);
+        tracker.addImage(imgLogo, imageCount);
+        imageCount++;
+        imgBanner = theKit.getImage(bannerName);
+        tracker.addImage(imgBanner, imageCount);
+        imageCount++;
 
         /**
          * ********Loading Icons....**********
          */
         iconArray = new Image[iconCount];
         for (count = 0; count < iconCount; count++) {
-            iconArray[count] = toolkit.getImage("icons/photo" + count + ".gif");
-            tracker.addImage(iconArray[count], ImageCount);
-            ImageCount++;
+            iconArray[count] = theKit.getImage("icons/photo" + count + ".gif");
+            tracker.addImage(iconArray[count], imageCount);
+            imageCount++;
         }
 
         /**
@@ -168,93 +76,338 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
             e.printStackTrace();
         }
 
-        setIconImage(toolkit.getImage("images/logo.gif"));
+        setIconImage(theKit.getImage("images/logo.gif"));
         setAppletStatus("");
         /**
          * ********Initializing all the Components********
          */
-        initializeAppletComponents();
+        initComponents();
+
+        userListModel = new DefaultListModel<>();
+        userCanvas.setModel(userListModel);
+        messageObject = new MessageObject();
+        listArray.add(messageObject);
+
+        roomListModel = new DefaultListModel<>();
+        roomCanvas.setModel(roomListModel);
+
+        loginToChat();
     }
 
     /**
-     * *****Initialize all the Applet Components*******
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
-    private void initializeAppletComponents() {
-        /**
-         * *****Common Settings**********
-         */
-        setBackground(BACKGROUND);
-        Font font = new Font("Dialog", Font.BOLD, 11);
-        textFont = new Font("Dialog", 0, 11);
-        setFont(font);
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
-        /**
-         * *********Top Panel Coding************
-         */
-        Panel TopPanel = new Panel(new BorderLayout());
-        TopPanel.setBackground(TOP_PANEL_BACKGROUND);
-        Panel LogoPanel = new ImagePanel(this, imgLogo);
-        TopPanel.add("East", LogoPanel);
-        Panel BannerPanel = new ImagePanel(this, imgBanner);
-        TopPanel.add("West", BannerPanel);
-        add("North", TopPanel);
+        topPanel = new javax.swing.JPanel();
+        logoPanel = new javax.swing.JPanel();
+        bannerPanel = new javax.swing.JPanel();
+        centerPanel = new javax.swing.JPanel();
+        inputPanel = new javax.swing.JPanel();
+        textBoxPanel = new javax.swing.JPanel();
+        lblGeneral = new javax.swing.JLabel();
+        textMessage = new javax.swing.JTextField();
+        btnSend = new javax.swing.JButton();
+        inputButtonPanel = new javax.swing.JPanel();
+        btnExit = new javax.swing.JButton();
+        emptyPanel = new javax.swing.JPanel();
+        informationPanel = new javax.swing.JPanel();
+        informationLabel = new javax.swing.JLabel();
+        tapPanel = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        userPanel = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        userCanvas = new javax.swing.JList<>();
+        userButtonPanel = new javax.swing.JPanel();
+        btnSendDirect = new javax.swing.JButton();
+        btnIgnoreUser = new javax.swing.JButton();
+        roomPanel = new javax.swing.JPanel();
+        roomScrollPane = new javax.swing.JScrollPane();
+        roomCanvas = new javax.swing.JList<>();
+        roomButtonPanel = new javax.swing.JPanel();
+        roomCountPanel = new javax.swing.JPanel();
+        lblCaption = new javax.swing.JLabel();
+        txtUserCount = new javax.swing.JTextField();
+        btnChangeRoom = new javax.swing.JButton();
+        imagesPanel = new javax.swing.JPanel();
+        userScrollPane = new javax.swing.JScrollPane();
+        imageCanvas = new javax.swing.JTextPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        messageCanvas = new javax.swing.JTextPane();
+        menuBar = new javax.swing.JMenuBar();
+        loginMenu = new javax.swing.JMenu();
+        loginItem = new javax.swing.JMenuItem();
+        disconnectItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        exitItem = new javax.swing.JMenuItem();
+        helpMenu = new javax.swing.JMenu();
+        aboutItem = new javax.swing.JMenuItem();
 
-        /**
-         * ***********Information Label Panel Coding************
-         */
-        Panel CenterPanel = new Panel(new BorderLayout());
-        Panel InformationPanel = new Panel(new BorderLayout());
-        InformationPanel.setBackground(INFORMATION_PANEL_BACKGROUND);
-        informationLabel = new Label();
-        informationLabel.setAlignment(1);
-        updateInformationLabel();
-        informationLabel.setForeground(LABEL_TEXT_COLOR);
-        InformationPanel.add("Center", informationLabel);
-        CenterPanel.add("North", InformationPanel);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("PRODUCT_NAME");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
-        /**
-         * *******Message Canvas and SSTAB Coding*******
-         */
-        Panel MessagePanel = new Panel(new BorderLayout());
-        messageCanvas = new MessageCanvas(this);
-        messageScrollView = new ScrollView(messageCanvas, true, true, TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        messageCanvas.scrollview = messageScrollView;
-        MessagePanel.add("Center", messageScrollView);
+        topPanel.setLayout(new java.awt.BorderLayout());
 
-        tapPanel = new TapPanel(this);
+        logoPanel.setLayout(new java.awt.BorderLayout());
+        topPanel.add(logoPanel, java.awt.BorderLayout.EAST);
 
-        MessagePanel.add("East", tapPanel);
-        CenterPanel.add("Center", MessagePanel);
+        bannerPanel.setLayout(new java.awt.BorderLayout());
+        topPanel.add(bannerPanel, java.awt.BorderLayout.WEST);
 
-        /**
-         * *******Input Panel Coding Starts..********
-         */
-        Panel InputPanel = new Panel(new BorderLayout());
-        Panel TextBoxPanel = new Panel(new BorderLayout());
-        Label LblGeneral = new Label("General Message!");
-        txtMessage = new TextField();
-        txtMessage.addKeyListener(this);
-        txtMessage.setFont(textFont);
-        cmdSend = new CustomButton(this, "Send Message!");
-        cmdSend.addActionListener(this);
-        TextBoxPanel.add("West", LblGeneral);
-        TextBoxPanel.add("Center", txtMessage);
-        TextBoxPanel.add("East", cmdSend);
-        InputPanel.add("Center", TextBoxPanel);
+        getContentPane().add(topPanel, java.awt.BorderLayout.PAGE_START);
 
-        Panel InputButtonPanel = new Panel(new BorderLayout());
-        cmdExit = new CustomButton(this, "Exit Chat");
-        cmdExit.addActionListener(this);
-        InputButtonPanel.add("Center", cmdExit);
-        InputPanel.add("East", InputButtonPanel);
+        centerPanel.setLayout(new java.awt.BorderLayout());
 
-        Panel EmptyPanel = new Panel();
-        InputPanel.add("South", EmptyPanel);
-        CenterPanel.add("South", InputPanel);
-        add("Center", CenterPanel);
+        inputPanel.setLayout(new java.awt.BorderLayout());
 
-        disableAll();
-        loginToChat();
+        textBoxPanel.setLayout(new java.awt.BorderLayout());
+
+        lblGeneral.setText("General Message! ");
+        textBoxPanel.add(lblGeneral, java.awt.BorderLayout.WEST);
+        textBoxPanel.add(textMessage, java.awt.BorderLayout.CENTER);
+
+        btnSend.setText("Send Message!");
+        textBoxPanel.add(btnSend, java.awt.BorderLayout.LINE_END);
+
+        inputPanel.add(textBoxPanel, java.awt.BorderLayout.CENTER);
+
+        inputButtonPanel.setLayout(new java.awt.BorderLayout());
+
+        btnExit.setText("Exit Chat");
+        inputButtonPanel.add(btnExit, java.awt.BorderLayout.PAGE_START);
+
+        inputPanel.add(inputButtonPanel, java.awt.BorderLayout.EAST);
+
+        javax.swing.GroupLayout emptyPanelLayout = new javax.swing.GroupLayout(emptyPanel);
+        emptyPanel.setLayout(emptyPanelLayout);
+        emptyPanelLayout.setHorizontalGroup(
+            emptyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        emptyPanelLayout.setVerticalGroup(
+            emptyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        inputPanel.add(emptyPanel, java.awt.BorderLayout.SOUTH);
+
+        centerPanel.add(inputPanel, java.awt.BorderLayout.PAGE_END);
+
+        informationPanel.setLayout(new java.awt.BorderLayout());
+
+        informationLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        informationLabel.setText("Information Label");
+        informationPanel.add(informationLabel, java.awt.BorderLayout.LINE_END);
+
+        centerPanel.add(informationPanel, java.awt.BorderLayout.NORTH);
+
+        tapPanel.setLayout(new java.awt.BorderLayout());
+
+        userPanel.setLayout(new java.awt.BorderLayout());
+
+        userCanvas.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                userCanvasValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(userCanvas);
+
+        userPanel.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        userButtonPanel.setLayout(new java.awt.BorderLayout());
+
+        btnSendDirect.setText("Send Direct Message");
+        userButtonPanel.add(btnSendDirect, java.awt.BorderLayout.NORTH);
+
+        btnIgnoreUser.setText("Ignore User");
+        userButtonPanel.add(btnIgnoreUser, java.awt.BorderLayout.SOUTH);
+
+        userPanel.add(userButtonPanel, java.awt.BorderLayout.SOUTH);
+
+        jTabbedPane1.addTab("User   ", userPanel);
+
+        roomPanel.setLayout(new java.awt.BorderLayout());
+
+        roomScrollPane.setViewportView(roomCanvas);
+
+        roomPanel.add(roomScrollPane, java.awt.BorderLayout.CENTER);
+
+        roomButtonPanel.setLayout(new java.awt.BorderLayout());
+
+        roomCountPanel.setLayout(new java.awt.BorderLayout());
+
+        lblCaption.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCaption.setText("ROOM COUNT");
+        lblCaption.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        roomCountPanel.add(lblCaption, java.awt.BorderLayout.NORTH);
+
+        txtUserCount.setEditable(false);
+        txtUserCount.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        roomCountPanel.add(txtUserCount, java.awt.BorderLayout.CENTER);
+
+        btnChangeRoom.setText("Change Room");
+        roomCountPanel.add(btnChangeRoom, java.awt.BorderLayout.PAGE_END);
+
+        roomButtonPanel.add(roomCountPanel, java.awt.BorderLayout.PAGE_START);
+
+        roomPanel.add(roomButtonPanel, java.awt.BorderLayout.PAGE_END);
+
+        jTabbedPane1.addTab("Rooms", roomPanel);
+
+        imagesPanel.setLayout(new java.awt.BorderLayout());
+
+        userScrollPane.setViewportView(imageCanvas);
+
+        imagesPanel.add(userScrollPane, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane1.addTab("Images", imagesPanel);
+
+        tapPanel.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+
+        centerPanel.add(tapPanel, java.awt.BorderLayout.LINE_END);
+
+        jScrollPane2.setViewportView(messageCanvas);
+
+        centerPanel.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(centerPanel, java.awt.BorderLayout.CENTER);
+
+        loginMenu.setText("Login");
+
+        loginItem.setText("Login");
+        loginMenu.add(loginItem);
+
+        disconnectItem.setText("Logout");
+        loginMenu.add(disconnectItem);
+        loginMenu.add(jSeparator1);
+
+        exitItem.setText("Exit");
+        loginMenu.add(exitItem);
+
+        menuBar.add(loginMenu);
+
+        helpMenu.setText("Help");
+
+        aboutItem.setText("About" + PRODUCT_NAME);
+        helpMenu.add(aboutItem);
+
+        menuBar.add(helpMenu);
+
+        setJMenuBar(menuBar);
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        disconnectChat();
+        System.exit(0);
+    }//GEN-LAST:event_formWindowClosing
+
+    private void userCanvasValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_userCanvasValueChanged
+        // TODO add your handling code here:
+        int index = userCanvas.getSelectedIndex();
+        selectedUser = userListModel.getElementAt(index);
+    }//GEN-LAST:event_userCanvasValueChanged
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            new ChatClient().setVisible(true);
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutItem;
+    private javax.swing.JPanel bannerPanel;
+    private javax.swing.JButton btnChangeRoom;
+    private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnIgnoreUser;
+    private javax.swing.JButton btnSend;
+    private javax.swing.JButton btnSendDirect;
+    private javax.swing.JPanel centerPanel;
+    private javax.swing.JMenuItem disconnectItem;
+    private javax.swing.JPanel emptyPanel;
+    private javax.swing.JMenuItem exitItem;
+    private javax.swing.JMenu helpMenu;
+    private javax.swing.JTextPane imageCanvas;
+    private javax.swing.JPanel imagesPanel;
+    private javax.swing.JLabel informationLabel;
+    private javax.swing.JPanel informationPanel;
+    private javax.swing.JPanel inputButtonPanel;
+    private javax.swing.JPanel inputPanel;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblCaption;
+    private javax.swing.JLabel lblGeneral;
+    private javax.swing.JMenuItem loginItem;
+    private javax.swing.JMenu loginMenu;
+    private javax.swing.JPanel logoPanel;
+    private javax.swing.JMenuBar menuBar;
+    private javax.swing.JTextPane messageCanvas;
+    private javax.swing.JPanel roomButtonPanel;
+    private javax.swing.JList<String> roomCanvas;
+    private javax.swing.JPanel roomCountPanel;
+    private javax.swing.JPanel roomPanel;
+    private javax.swing.JScrollPane roomScrollPane;
+    private javax.swing.JPanel tapPanel;
+    private javax.swing.JPanel textBoxPanel;
+    private javax.swing.JTextField textMessage;
+    private javax.swing.JPanel topPanel;
+    private javax.swing.JTextField txtUserCount;
+    private javax.swing.JPanel userButtonPanel;
+    private javax.swing.JList<String> userCanvas;
+    private javax.swing.JPanel userPanel;
+    private javax.swing.JScrollPane userScrollPane;
+    // End of variables declaration//GEN-END:variables
+    private DefaultListModel<String> userListModel, roomListModel;
+
+    //For future Network class 
+    private String userName, serverData, roomList, splitString;
+    private String userRoom, serverName, proxyHost;
+    private int serverPort, proxyPort, totalUserCount;
+    private boolean startFlag, isProxy;
+    private Socket socket;
+    private BufferedReader in; //private DataInputStream in;
+    private DataOutputStream out;
+
+    private Thread thread;
+    private StringTokenizer tokenizer;
+
+    private String selectedUser;
+
+    private Image imgLogo, imgBanner;
+    private MediaTracker tracker;
+    private Image[] iconArray;
+    protected PrivateChat[] privateWindows;
+    protected int count, iconCount, privateWindowCount;
+    private InformationDialog dialog;
+    private Toolkit theKit;
+    private String chatLogo, bannerName;
+    private StringBuffer stringBuffer;
+    private String appletStatus;
+     ArrayList<MessageObject> listArray;
+    MessageObject messageObject;
+    
+    public String getUserName() {
+        return userName;
+    }
+
+    public JList<String> getUserCanvas() {
+        return userCanvas;
     }
 
     private void loginToChat() {
@@ -264,10 +417,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         dialog = new InformationDialog(this);
         if (dialog.isConnect) {
             userName = dialog.getTxtUserName();
-            //UserRoom 	= dialog.roomChoice.getSelectedItem();
+            //UserRoom 	= dialog.roomchoice.getSelectedItem();
             serverName = dialog.getTxtServerName();
             serverPort = Integer.parseInt(dialog.getTxtServerPort());
-            if (dialog.isProxyCheckBox()) {
+            if (dialog.isProxyCheckBox()) {//getState()
                 isProxy = true;
                 proxyHost = dialog.getTxtProxyHost();
                 proxyPort = Integer.parseInt(dialog.getTxtProxyPort());
@@ -301,7 +454,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                 }
                 socket.close();
                 socket = null;
-                tapPanel.userCanvas.clearAll();
+                userListModel.clear(); //tapPanel.userCanvas.clearAll();
             } catch (IOException ie) {
                 ie.printStackTrace();
             }
@@ -336,17 +489,19 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.userCanvas.clearAll();
+                    userListModel.clear();//tapPanel.userCanvas.clearAll();
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                        userListModel.addElement(tokenizer.nextToken()); 
+//tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
-                    messageCanvas.ClearAll();
-                    messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
+                    messageCanvas.setText("");//messageCanvas.ClearAll();
+                    appendToPane(messageCanvas, "<span> Welcome To The " + userRoom + " Room!</span>");
+                    //messageCanvas.addMessageToMessageObject("Welcome To The " + userRoom + " Room!", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
-                 * *******Room Rfc *******
+                 * *******Room RFC *******
                  */
                 if (serverData.startsWith("ROOM")) {
                     /**
@@ -359,10 +514,11 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ********Add User Item into User Canvas ********
                      */
-                    tapPanel.roomCanvas.clearAll();
-                    tapPanel.roomCanvas.addListItemToMessageObject(userRoom);
+                    roomListModel.clear();//tapPanel.roomCanvas.clearAll();
+                    roomListModel.addElement(userRoom);//tapPanel.roomCanvas.addListItemToMessageObject(userRoom);
                     while (tokenizer.hasMoreTokens()) {
-                        tapPanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
+                        roomListModel.addElement(tokenizer.nextToken());
+                        //tapPanel.roomCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
                 }
 
@@ -381,15 +537,17 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                      */
                     splitString = serverData.substring(5);
                     enablePrivateWindow(splitString);
-                    tapPanel.userCanvas.addListItemToMessageObject(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                    userListModel.addElement(splitString);//tapPanel.userCanvas.addListItemToMessageObject(splitString);
+                    appendToPane(messageCanvas, "<span>" + splitString + " joins chat...</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
                  * *******If User Name Already Exists *********
                  */
                 if (serverData.startsWith("EXIS")) {
-                    messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas, "<span> User Name Already Exists... Try Again With Some Other Name!</span>");
+                    //messageCanvas.addMessageToMessageObject(" User Name Already Exists... Try Again With Some Other Name!", MESSAGE_TYPE_ADMIN);
                     thread = null;
                     quitConnection(QUIT_TYPE_NULL);
                 }
@@ -398,11 +556,14 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  * ****** REMOVE User RFC Coding *********
                  */
                 if (serverData.startsWith("REMO")) {
-                    splitString = serverData.substring(5);
+                    splitString = serverData.substring(5); //REMO~NAME
 
-                    tapPanel.userCanvas.removeListItem(splitString);
+                    //tapPanel.userCanvas.removeListItem(splitString);
+                    userListModel.removeElement(splitString);
+
                     removeUserFromPrivateChat(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
+                    appendToPane(messageCanvas, "<span>" + splitString + " has been logged Out from Chat!</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has been logged Out from Chat!", MESSAGE_TYPE_LEAVE);
 
                     /**
                      * ***Update the Information Label *******
@@ -417,10 +578,11 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("MESS")) {
                     /**
-                     * ** Chk whether ignored user ********
+                     * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.userCanvas.isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
-                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
+                    if (!(isIgnoredUser(serverData.substring(5, serverData.indexOf(":"))))) {
+                        appendToPane(messageCanvas, "<span>" + serverData.substring(5) + "</span>");
+//                        messageCanvas.addMessageToMessageObject(serverData.substring(5), MESSAGE_TYPE_DEFAULT);
                     }
                 }
 
@@ -428,7 +590,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  * *** KICK RFC Starts **********
                  */
                 if (serverData.startsWith("KICK")) {
-                    messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas, "<span>You are Kicked Out From Chat for flooding the message!</span>");
+//                    messageCanvas.addMessageToMessageObject("You are Kicked Out From Chat for flooding the message!", MESSAGE_TYPE_ADMIN);
                     thread = null;
                     quitConnection(QUIT_TYPE_KICK);
                 }
@@ -438,9 +601,11 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("INKI")) {
                     splitString = serverData.substring(5);
-                    tapPanel.userCanvas.removeListItem(splitString);
+                    //tapPanel.userCanvas.removeListItem(splitString);
+                    userListModel.removeElement(splitString);
                     removeUserFromPrivateChat(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
+                    appendToPane(messageCanvas, "<span>" + splitString + " has been kicked Out from Chat by the Administrator!</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has been kicked Out from Chat by the Administrator!", MESSAGE_TYPE_ADMIN);
 
                     /**
                      * ***Update the Information Label *******
@@ -461,14 +626,15 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("JORO")) {
                     splitString = serverData.substring(5);
-                    tapPanel.userCanvas.addListItemToMessageObject(splitString);
+                    userListModel.addElement(splitString);
+                    //tapPanel.userCanvas.addListItemToMessageObject(splitString);
                     /**
                      * ***Update the Information Label *******
                      */
                     totalUserCount++;
                     updateInformationLabel();
-
-                    messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
+                    appendToPane(messageCanvas, "<span>" + splitString + " joins chat...</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " joins chat...", MESSAGE_TYPE_JOIN);
                 }
 
                 /**
@@ -476,8 +642,13 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("LERO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.userCanvas.removeListItem(splitString);
-                    messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
+                    userListModel.removeElement(splitString);
+                    //)tapPanel.userCanvas.removeListItem(splitString);
+                    appendToPane(messageCanvas, "<span>" + splitString + " has leaves "
+                            + userRoom + " Room and join into "
+                            + serverData.substring(serverData.indexOf("~") + 1)
+                            + " Room</span>");
+                    //messageCanvas.addMessageToMessageObject(splitString + " has leaves " + userRoom + " Room and join into " + serverData.substring(serverData.indexOf("~") + 1) + " Room", MESSAGE_TYPE_ADMIN);
 
                     /**
                      * ***Update the Information Label *******
@@ -491,7 +662,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                  */
                 if (serverData.startsWith("ROCO")) {
                     splitString = serverData.substring(5, serverData.indexOf("~"));
-                    tapPanel.txtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
+                    txtUserCount.setText("Total Users in " + splitString + " : " + serverData.substring(serverData.indexOf("~") + 1));
                 }
 
                 /**
@@ -502,7 +673,7 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     /**
                      * ** Check whether ignored user ********
                      */
-                    if (!(tapPanel.userCanvas.isIgnoredUser(splitString))) {
+                    if (!(isIgnoredUser(splitString))) {
                         boolean PrivateFlag = false;
                         for (count = 0; count < privateWindowCount; count++) {
                             if (privateWindows[count].userName.equals(splitString)) {
@@ -516,7 +687,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
 
                         if (!(PrivateFlag)) {
                             if (privateWindowCount >= MAX_PRIVATE_WINDOW) {
-                                messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
+                                appendToPane(messageCanvas, "<span>You are Exceeding private window limit! So you may lose some message from your friends!</span>");
+//                                messageCanvas.addMessageToMessageObject("You are Exceeding private window limit! So you may lose some message from your friends!", MESSAGE_TYPE_ADMIN);
                             } else {
                                 privateWindows[privateWindowCount++] = new PrivateChat(this, splitString);
                                 privateWindows[privateWindowCount - 1].addMessageToMessageCanvas(serverData.substring(5));
@@ -527,7 +699,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
                     }
                 }
             } catch (IOException e) {
-                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
+                appendToPane(messageCanvas, "<span>" + e.getMessage() + "</span>");
+//                messageCanvas.addMessageToMessageObject(e.getMessage(), MESSAGE_TYPE_ADMIN);
                 quitConnection(QUIT_TYPE_DEFAULT);
                 e.printStackTrace();
             }
@@ -535,93 +708,16 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     }
 
     /**
-     * *******Button Events ****
-     */
-    @Override
-    public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource().equals(cmdSend)) {
-            if (!(txtMessage.getText().trim().equals(""))) {
-                sendMessage();
-            }
-        }
-
-        if ((evt.getSource().equals(cmdExit)) || (evt.getSource().equals(quitItem))) {
-            disconnectChat();
-            System.exit(0);
-        }
-
-        if (evt.getSource().equals(loginItem)) {
-            loginToChat();
-        }
-
-        if (evt.getSource().equals(disconnectItem)) {
-            disconnectChat();
-        }
-        if (evt.getSource().equals(aboutItem)) {
-//            MessageBox messagebox = new MessageBox(this, false);
-//            messagebox.AddMessage("~~13 " + PRODUCT_NAME);
-//            messagebox.AddMessage("Developed By...");
-//            messagebox.AddMessage(COMPANY_NAME);
-
-            JOptionPane.showMessageDialog(this, PRODUCT_NAME + "\n Developed By...\n" + COMPANY_NAME,
-                    "About Us", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("icons/photo13.gif"));
-        }
-    }
-
-    /**
-     * ******* Key Listener Event ************
-     */
-    @Override
-    public void keyPressed(KeyEvent evt) {
-        if ((evt.getKeyCode() == 10) && (!(txtMessage.getText().trim().equals("")))) {
-            sendMessage();
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
-
-    //Getter and Setter Methods
-
-    public TapPanel getTapPanel() {
-        return tapPanel;
-    }
-
-    public Font getTextFont() {
-        return textFont;
-    }
-
-    public String getUserName() {
-        return userName;
-    }   
-
-    public MessageCanvas getMessageCanvas() {
-        return messageCanvas;
-    }
-
-    public int getIconCount() {
-        return iconCount;
-    }
-
-    public Image getIcon(int index) {
-        return iconArray[index];
-    }
-    
-    /**
      * ********Setting the appletStatus*******
      */
-    private void setAppletStatus(String Message) {
+    private void setAppletStatus(String message) {
         if (messageCanvas != null) {
-            messageCanvas.addMessageToMessageObject(Message, MESSAGE_TYPE_ADMIN);
+            appendToPane(messageCanvas, "<span>" + message + "</span>");
+            //messageCanvas.addMessageToMessageObject(message, MESSAGE_TYPE_ADMIN);
         }
     }
 
-     /**
+    /**
      * *******Function To Update the Information Label****
      */
     private void updateInformationLabel() {
@@ -637,12 +733,13 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         stringBuffer.append("       ");
         informationLabel.setText(stringBuffer.toString());
     }
+
     /**
      * *** Function To Disable All Components *******
      */
     private void disableAll() {
-        txtMessage.setEnabled(false);
-        cmdSend.setEnabled(false);
+        textMessage.setEnabled(false);
+        btnSend.setEnabled(false);
         tapPanel.setEnabled(false);
         disconnectItem.setEnabled(false);
         loginItem.setEnabled(true);
@@ -655,8 +752,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * *** Function To Enable All Components *******
      */
     private void enableAll() {
-        txtMessage.setEnabled(true);
-        cmdSend.setEnabled(true);
+        textMessage.setEnabled(true);
+        btnSend.setEnabled(true);
         tapPanel.setEnabled(true);
         disconnectItem.setEnabled(true);
         loginItem.setEnabled(false);
@@ -667,7 +764,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      */
     private void disconnectChat() {
         if (socket != null) {
-            messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
+            appendToPane(messageCanvas, "<span>CONNECTION TO THE SERVER CLOSED</span>");
+//            messageCanvas.addMessageToMessageObject("CONNECTION TO THE SERVER CLOSED", MESSAGE_TYPE_ADMIN);
             quitConnection(QUIT_TYPE_DEFAULT);
         }
     }
@@ -678,7 +776,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     private void enablePrivateWindow(String ToUserName) {
         for (count = 0; count < privateWindowCount; count++) {
             if (privateWindows[count].userName.equals(ToUserName)) {
-                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].appendToPane(privateWindows[count].getMessageCanvas(), ToUserName + " is Currently Online!");
+                //privateWindows[count].getMessageCanvas.addMessageToMessageObject(ToUserName + " is Currently Online!", MESSAGE_TYPE_ADMIN);
                 privateWindows[count].enableAll();
                 return;
             }
@@ -691,7 +790,8 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     private void removeUserFromPrivateChat(String ToUserName) {
         for (count = 0; count < privateWindowCount; count++) {
             if (privateWindows[count].userName.equals(ToUserName)) {
-                privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
+                 privateWindows[count].appendToPane(privateWindows[count].getMessageCanvas(), ToUserName + " is Currently Offline!");
+               // privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
                 privateWindows[count].disableAll();
                 return;
             }
@@ -701,9 +801,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     /**
      * *****Function To Send Private Message To Server **********
      */
-    protected void sentPrivateMessageToServer(String Message, String ToUserName) {
-        sendMessageToServer("PRIV " + ToUserName + "~"
-                + userName + ": " + Message);
+    protected void sentPrivateMessageToServer(String message, String toUserName) {
+        sendMessageToServer("PRIV " + toUserName + "~"
+                + userName + ": " + message);
     }
 
     /**
@@ -728,18 +828,21 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * ******* Function to Change Room ******
      */
     protected void changeRoom() {
-        if (tapPanel.roomCanvas.selectedUser.equals("")) {
-            messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
+        int index = roomCanvas.getSelectedIndex();
+        String user = roomListModel.get(index);
+        if (user.equals("")) {
+            appendToPane(messageCanvas, "<span> Invalid Room Selection!</span>");
+//            messageCanvas.addMessageToMessageObject("Invalid Room Selection!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        if (tapPanel.roomCanvas.selectedUser.equals(userRoom)) {
-            messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
+        if (user.equals(userRoom)) {
+            appendToPane(messageCanvas, "<span> You are already in that ROOM!</span>");
+//            messageCanvas.addMessageToMessageObject("You are already in that ROOM!", MESSAGE_TYPE_ADMIN);
             return;
         }
 
-        sendMessageToServer("CHRO " + userName + "~"
-                + tapPanel.roomCanvas.selectedUser);
+        sendMessageToServer("CHRO " + userName + "~" + user);
     }
 
     /**
@@ -753,10 +856,10 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
      * ****** Function to Set the Image Name into Text Field ***********
      */
     protected void addImageToTextField(String imageName) {
-        if (txtMessage.getText() == null || txtMessage.getText().equals("")) {
-            txtMessage.setText("~~" + imageName + " ");
+        if (textMessage.getText() == null || textMessage.getText().equals("")) {
+            textMessage.setText("~~" + imageName + " ");
         } else {
-            txtMessage.setText(txtMessage.getText() + " "
+            textMessage.setText(textMessage.getText() + " "
                     + "~~" + imageName + " ");
         }
     }
@@ -765,8 +868,9 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
         /**
          * *********Initialize the Socket******
          */
-        messageCanvas.ClearAll();
-        messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...", MESSAGE_TYPE_ADMIN);
+        messageCanvas.setText("");//messageCanvas.ClearAll();
+        appendToPane(messageCanvas, "<span>Connecting To Server... Please Wait...</span>");
+//        messageCanvas.addMessageToMessageObject("Connecting To Server... Please Wait...", MESSAGE_TYPE_ADMIN);
         /**
          * *********Initialize the Socket******
          */
@@ -804,17 +908,89 @@ public class ChatClient extends Frame implements Serializable, KeyListener,
     }
 
     /**
-     * ****** Function To Send MESS Rfc to Server ************
+     * ****** Function To Send MESS RFC to Server ************
      */
     private void sendMessage() {
         /**
          * ******Sending a Message To Server ********
          */
         sendMessageToServer("MESS " + userRoom + "~" + userName + ": "
-                + txtMessage.getText());
-        messageCanvas.addMessageToMessageObject(userName + ": "
-                + txtMessage.getText(), MESSAGE_TYPE_DEFAULT);
-        txtMessage.setText("");
-        txtMessage.requestFocus();
+                + textMessage.getText());
+        appendToPane(messageCanvas, "<span>" + userName + ": " + textMessage.getText() + "...</span>");
+        textMessage.setText("");
+        textMessage.requestFocus();
+    }
+
+    // send html to pane
+    private void appendToPane(JTextPane tp, String msg) {
+        HTMLDocument doc = (HTMLDocument) tp.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+            tp.setCaretPosition(doc.getLength());
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ********Set or Remove Ignore List from Array
+     *
+     *******
+     * @param isIgnore
+     */
+    protected void ignoreUser(boolean isIgnore) {
+        if (selectedUser.equals("")) {
+            appendToPane(messageCanvas, "<span>Invalid User Selection!</span>");
+            //chatClient.getMessageCanvas().addMessageToMessageObject("Invalid User Selection!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+        if (selectedUser.equals(userName)) {
+            appendToPane(messageCanvas, "<span>You can not ignored yourself!</span>");
+            //chatClient.getMessageCanvas().addMessageToMessageObject("You can not ignored yourself!", MESSAGE_TYPE_ADMIN);
+            return;
+        }
+
+        ignoreUser(isIgnore, selectedUser);
+
+    }
+   
+    protected void ignoreUser(boolean isIgnore, String ignoreUserName) {
+        int listIndex = userListModel.indexOf(ignoreUserName);//getIndexOf(ignoreUserName);
+        if (listIndex >= 0) {
+            messageObject = listArray.get(listIndex);
+            messageObject.isIgnored = isIgnore;
+            listArray.set(listIndex, messageObject);
+
+            if (isIgnore) {
+                btnIgnoreUser.setText("Allow User");
+                appendToPane(messageCanvas, "<span>" + ignoreUserName + " has been ignored!</span>");
+                //chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
+            } else {
+                btnIgnoreUser.setText("Ignore User");
+                appendToPane(messageCanvas, "<span>" + ignoreUserName + " has been romoved from ignored list!</span>");
+                //chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been romoved from ignored list!", MESSAGE_TYPE_JOIN);
+            }
+        }
+    }
+
+    /**
+     * ******** Check Whether the User ignored or not
+     *
+     ********
+     * @param userName
+     * @return
+     */
+    protected boolean isIgnoredUser(String userName) {
+        int m_listIndex = userListModel.indexOf(userName);//getIndexOf(userName);
+        if (m_listIndex >= 0) {
+            messageObject = listArray.get(m_listIndex);
+            return messageObject.isIgnored;
+        }
+
+        /**
+         * **By Default***
+         */
+        return false;
     }
 }

@@ -14,6 +14,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class PrivateChat extends Frame implements CommonSettings, KeyListener, 
         ActionListener {
@@ -27,9 +33,9 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
     private boolean emotionFlag;
 
     private Button cmdSend, cmdClose, cmdIgnore, cmdClear, cmdEmoticons;
-    private EmotionCanvas emotionCanvas;
-    private ScrollView emotionScrollView, messageScrollView;
-    private MessageCanvas messageCanvas;//Replace with JtextPane
+    private JTextPane emotionCanvas;
+//    private ScrollView emotionScrollView, messageScrollView;
+    private JTextPane messageCanvas;//Replace with JtextPane
     private Panel emotionPanel;
 
 
@@ -54,7 +60,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
         });
     }
 
-    public MessageCanvas getMessageCanvas() {
+    public JTextPane getMessageCanvas() {
         return messageCanvas;
     }
 
@@ -69,17 +75,18 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
         add(LblConversation);
 
         Panel MessagePanel = new Panel(new BorderLayout());
-        messageCanvas = new MessageCanvas(chatClient);
-        messageScrollView = new ScrollView(messageCanvas, true, true,
-                TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        messageCanvas.scrollview = messageScrollView;
-        MessagePanel.add("Center", messageScrollView);
+        messageCanvas = new JTextPane();//new MessageCanvas(chatClient);
+//        messageScrollView = new ScrollView(messageCanvas, true, true,
+//                TAPPANEL_CANVAS_WIDTH, TAPPANEL_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+//        messageCanvas.scrollview = messageScrollView;
+        JScrollPane jMessageCanvasSP = new JScrollPane(messageCanvas);
+        MessagePanel.add("Center", jMessageCanvasSP);
         MessagePanel.setBounds(5, 50, 400, 200);
         add(MessagePanel);
 
         txtMessage = new TextField();
         txtMessage.addKeyListener(this);
-        txtMessage.setFont(chatClient.getTextFont());
+        txtMessage.setFont(chatClient.getFont());//.getTextFont());
         txtMessage.setBounds(5, 260, 320, 20);
         add(txtMessage);
 
@@ -110,15 +117,17 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
         add(cmdEmoticons);
 
         emotionPanel = new Panel(new BorderLayout());
-        emotionCanvas = new EmotionCanvas(chatClient, this);
-        emotionScrollView = new ScrollView(emotionCanvas, true, true,
-                EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
-        emotionCanvas.scrollView = emotionScrollView;
+         
+        emotionCanvas = new JTextPane();//new EmotionCanvas(chatClient, this);
+        JScrollPane jEmotionCanvasSP = new JScrollPane(emotionCanvas);
+//        emotionScrollView = new ScrollView(emotionCanvas, true, true,
+//                EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT, SCROLL_BAR_SIZE);
+//        emotionCanvas.scrollView = emotionScrollView;
         /**
          * ********Add Icons into MessageObject ********
          */
-        emotionCanvas.addIconsToMessageObject();
-        emotionPanel.add("Center", emotionScrollView);
+//        emotionCanvas.addIconsToMessageObject();
+        emotionPanel.add("Center", jEmotionCanvasSP);
         emotionPanel.setVisible(false);
         emotionPanel.setBounds(5, 320,
                 EMOTION_CANVAS_WIDTH, EMOTION_CANVAS_HEIGHT);
@@ -155,7 +164,7 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
          * *******Clear Button Event *******
          */
         if (evt.getSource().equals(cmdClear)) {
-            messageCanvas.ClearAll();
+            messageCanvas.setText("");//ClearAll();
         }
 
         /**
@@ -163,12 +172,14 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
          */
         if (evt.getSource().equals(cmdIgnore)) {
             if (evt.getActionCommand().equals("Ignore User")) {
-                chatClient.getTapPanel().userCanvas.ignoreUser(true, userName);
-                messageCanvas.addMessageToMessageObject(userName + " has been ignored!", MESSAGE_TYPE_ADMIN);
+                chatClient.ignoreUser(true, userName);
+                appendToPane(messageCanvas, "<span>"+userName + " has been ignored!"+"</span>");
+//                messageCanvas.addMessageToMessageObject(userName + " has been ignored!", MESSAGE_TYPE_ADMIN);
                 cmdIgnore.setLabel("Allow User");
             } else {
-                messageCanvas.addMessageToMessageObject(userName + " has been removed from ignored list!", MESSAGE_TYPE_ADMIN);
-                chatClient.getTapPanel().userCanvas.ignoreUser(false, userName);
+                appendToPane(messageCanvas, "<span>"+userName + " has been removed from ignored list!"+"</span>");
+//                messageCanvas.addMessageToMessageObject(userName + " has been removed from ignored list!", MESSAGE_TYPE_ADMIN);
+                chatClient.ignoreUser(false, userName);
                 cmdIgnore.setLabel("Ignore User");
             }
         }
@@ -209,7 +220,8 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
     }
 
     private void sendMessage() {
-        messageCanvas.addMessageToMessageObject(chatClient.getUserName() + ": " + txtMessage.getText(), MESSAGE_TYPE_DEFAULT);
+        appendToPane(messageCanvas, "<span>"+chatClient.getUserName() + ": " + txtMessage.getText()+"</span>");
+//        messageCanvas.addMessageToMessageObject(chatClient.getUserName() + ": " + txtMessage.getText(), MESSAGE_TYPE_DEFAULT);
         chatClient.sentPrivateMessageToServer(txtMessage.getText(), userName);
         txtMessage.setText("");
         txtMessage.requestFocus();
@@ -231,7 +243,8 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
      * *******Function to Add a Message To Messagecanvas ********
      */
     protected void addMessageToMessageCanvas(String message) {
-        messageCanvas.addMessageToMessageObject(message, MESSAGE_TYPE_DEFAULT);
+        appendToPane(messageCanvas, "<span>"+message+"</span>");
+//        messageCanvas.addMessageToMessageObject(message, MESSAGE_TYPE_DEFAULT);
     }
 
     protected void disableAll() {
@@ -251,5 +264,16 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
         chatClient.removePrivateWindow(userName);
         setVisible(false);
     }
-
+    
+ // send html to pane
+    public void appendToPane(JTextPane tp, String msg) {
+        HTMLDocument doc = (HTMLDocument) tp.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+            tp.setCaretPosition(doc.getLength());
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
 }
