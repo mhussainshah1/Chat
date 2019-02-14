@@ -275,6 +275,7 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
 
         centerPanel.add(tapPanel, java.awt.BorderLayout.LINE_END);
 
+        messageCanvas.setContentType("text/html"); // NOI18N
         jScrollPane2.setViewportView(messageCanvas);
 
         centerPanel.add(jScrollPane2, java.awt.BorderLayout.CENTER);
