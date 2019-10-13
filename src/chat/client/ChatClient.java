@@ -3,6 +3,7 @@ package chat.client;
 import static chat.client.CommonSettings.*;
 import chat.client.net.SocksSocket;
 import chat.client.net.SocksSocketImplFactory;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
@@ -14,7 +15,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
@@ -82,6 +85,11 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
          * ********Initializing all the Components********
          */
         initComponents();
+
+        Toolkit theKit = getToolkit();
+        Dimension wndSize = theKit.getScreenSize();
+        setSize(wndSize.width / 2, wndSize.height / 2);
+        setLocationRelativeTo(null);
 
         userListModel = new DefaultListModel<>();
         userCanvas.setModel(userListModel);
@@ -173,9 +181,20 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
 
         lblGeneral.setText("General Message! ");
         textBoxPanel.add(lblGeneral, java.awt.BorderLayout.WEST);
+
+        textMessage.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textMessageKeyPressed(evt);
+            }
+        });
         textBoxPanel.add(textMessage, java.awt.BorderLayout.CENTER);
 
         btnSend.setText("Send Message!");
+        btnSend.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendActionPerformed(evt);
+            }
+        });
         textBoxPanel.add(btnSend, java.awt.BorderLayout.LINE_END);
 
         inputPanel.add(textBoxPanel, java.awt.BorderLayout.CENTER);
@@ -183,6 +202,11 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         inputButtonPanel.setLayout(new java.awt.BorderLayout());
 
         btnExit.setText("Exit Chat");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
         inputButtonPanel.add(btnExit, java.awt.BorderLayout.PAGE_START);
 
         inputPanel.add(inputButtonPanel, java.awt.BorderLayout.EAST);
@@ -285,13 +309,28 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         loginMenu.setText("Login");
 
         loginItem.setText("Login");
+        loginItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginItemActionPerformed(evt);
+            }
+        });
         loginMenu.add(loginItem);
 
         disconnectItem.setText("Logout");
+        disconnectItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                disconnectItemActionPerformed(evt);
+            }
+        });
         loginMenu.add(disconnectItem);
         loginMenu.add(jSeparator1);
 
         exitItem.setText("Exit");
+        exitItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitItemActionPerformed(evt);
+            }
+        });
         loginMenu.add(exitItem);
 
         menuBar.add(loginMenu);
@@ -299,6 +338,11 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         helpMenu.setText("Help");
 
         aboutItem.setText("About" + PRODUCT_NAME);
+        aboutItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutItemActionPerformed(evt);
+            }
+        });
         helpMenu.add(aboutItem);
 
         menuBar.add(helpMenu);
@@ -318,6 +362,42 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         int index = userCanvas.getSelectedIndex();
         selectedUser = userListModel.getElementAt(index);
     }//GEN-LAST:event_userCanvasValueChanged
+
+    private void aboutItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutItemActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this, PRODUCT_NAME + "\n Developed By...\n" + COMPANY_NAME,
+                "About Us", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("icons/photo13.gif"));
+    }//GEN-LAST:event_aboutItemActionPerformed
+
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        disconnectChat();
+        System.exit(0);
+    }//GEN-LAST:event_btnExitActionPerformed
+
+    private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
+        if (!(textMessage.getText().trim().equals(""))) {
+            sendMessage();
+        }
+    }//GEN-LAST:event_btnSendActionPerformed
+
+    private void exitItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitItemActionPerformed
+        disconnectChat();
+        System.exit(0);
+    }//GEN-LAST:event_exitItemActionPerformed
+
+    private void textMessageKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textMessageKeyPressed
+        if ((evt.getKeyCode() == 10) && (!(textMessage.getText().trim().equals("")))) {
+            sendMessage();
+        }
+    }//GEN-LAST:event_textMessageKeyPressed
+
+    private void disconnectItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disconnectItemActionPerformed
+        disconnectChat();
+    }//GEN-LAST:event_disconnectItemActionPerformed
+
+    private void loginItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginItemActionPerformed
+        loginToChat();
+    }//GEN-LAST:event_loginItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -400,9 +480,9 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
     private String chatLogo, bannerName;
     private StringBuffer stringBuffer;
     private String appletStatus;
-     ArrayList<MessageObject> listArray;
+    ArrayList<MessageObject> listArray;
     MessageObject messageObject;
-    
+
     public String getUserName() {
         return userName;
     }
@@ -492,7 +572,7 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
                      */
                     userListModel.clear();//tapPanel.userCanvas.clearAll();
                     while (tokenizer.hasMoreTokens()) {
-                        userListModel.addElement(tokenizer.nextToken()); 
+                        userListModel.addElement(tokenizer.nextToken());
 //tapPanel.userCanvas.addListItemToMessageObject(tokenizer.nextToken());
                     }
 
@@ -791,8 +871,8 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
     private void removeUserFromPrivateChat(String ToUserName) {
         for (count = 0; count < privateWindowCount; count++) {
             if (privateWindows[count].userName.equals(ToUserName)) {
-                 privateWindows[count].appendToPane(privateWindows[count].getMessageCanvas(), ToUserName + " is Currently Offline!");
-               // privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
+                privateWindows[count].appendToPane(privateWindows[count].getMessageCanvas(), ToUserName + " is Currently Offline!");
+                // privateWindows[count].getMessageCanvas().addMessageToMessageObject(ToUserName + " is Currently Offline!", MESSAGE_TYPE_ADMIN);
                 privateWindows[count].disableAll();
                 return;
             }
@@ -955,15 +1035,15 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         ignoreUser(isIgnore, selectedUser);
 
     }
-   
-    protected void ignoreUser(boolean isIgnore, String ignoreUserName) {
+
+    protected void ignoreUser(boolean ignore, String ignoreUserName) {
         int listIndex = userListModel.indexOf(ignoreUserName);//getIndexOf(ignoreUserName);
         if (listIndex >= 0) {
             messageObject = listArray.get(listIndex);
-            messageObject.isIgnored = isIgnore;
+            messageObject.setIgnore(ignore);//isIgnored = ignore;
             listArray.set(listIndex, messageObject);
 
-            if (isIgnore) {
+            if (ignore) {
                 btnIgnoreUser.setText("Allow User");
                 appendToPane(messageCanvas, "<span>" + ignoreUserName + " has been ignored!</span>");
                 //chatClient.getMessageCanvas().addMessageToMessageObject(ignoreUserName + " has been ignored!", MESSAGE_TYPE_LEAVE);
@@ -986,7 +1066,7 @@ public class ChatClient extends javax.swing.JFrame implements Runnable {
         int m_listIndex = userListModel.indexOf(userName);//getIndexOf(userName);
         if (m_listIndex >= 0) {
             messageObject = listArray.get(m_listIndex);
-            return messageObject.isIgnored;
+            return messageObject.isIgnore();
         }
 
         /**

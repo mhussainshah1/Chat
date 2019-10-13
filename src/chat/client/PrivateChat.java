@@ -69,10 +69,10 @@ public class PrivateChat extends Frame implements CommonSettings, KeyListener,
      */
     private void initializeComponents() {
         setLayout(null);
-        Label LblConversation = new Label("Conversation With " + userName);
-        LblConversation.setForeground(MESSAGE_CANVAS);
-        LblConversation.setBounds(5, 30, 400, 20);
-        add(LblConversation);
+        Label lblConversation = new Label("Conversation With " + userName);
+        lblConversation.setForeground(MESSAGE_CANVAS);
+        lblConversation.setBounds(5, 30, 400, 20);
+        add(lblConversation);
 
         Panel MessagePanel = new Panel(new BorderLayout());
         messageCanvas = new JTextPane();//new MessageCanvas(chatClient);

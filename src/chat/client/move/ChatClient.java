@@ -1,5 +1,8 @@
 package chat.client.move;
 
+import chat.client.ImagePanel;
+import chat.client.InformationDialog;
+import chat.client.PrivateChat;
 import chat.client.net.SocksSocketImplFactory;
 import chat.client.net.SocksSocket;
 import java.awt.BorderLayout;

@@ -6,8 +6,8 @@ import java.awt.Graphics;
 
 public class ImagePanel extends Panel implements CommonSettings {
 
-    ChatClient Parent;
-    Image DisplayImage;
+    private ChatClient Parent;
+    private Image DisplayImage;
     ImagePanel(ChatClient chatclient, Image image) {
         setLayout(null);
         Parent = chatclient;
@@ -16,6 +16,7 @@ public class ImagePanel extends Panel implements CommonSettings {
         int YPos = image.getHeight(this);
         setBounds(0, 0, XPos + TOP_PANEL_START_POS, YPos + TOP_PANEL_START_POS);
     }
+    
     @Override
     public void paint(Graphics graphics) {
         graphics.drawImage(DisplayImage, TOP_PANEL_START_POS, TOP_PANEL_START_POS, this);

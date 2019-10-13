@@ -18,12 +18,12 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
     private Properties properties;
     private ServerSocket serverSocket;
     private Socket socket;
-    private ArrayList<ClientObject> userArrayList;
-    private ArrayList<String> messageArrayList;
+    private ArrayList<Client> clientList;
+    private ArrayList<String> messageList;
     private Thread thread;
     private DataOutputStream out;
     private int count;
-    private ClientObject clientObject;
+    private Client client;
     private String roomList;
     private ChatCommunication chatCommunication;
 
@@ -49,8 +49,8 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
         /**
          * ****** Initialize the Array List *********
          */
-        userArrayList = new ArrayList<>();
-        messageArrayList = new ArrayList<>();
+        clientList = new ArrayList<>();
+        messageList = new ArrayList<>();
 
         /**
          * ****** Initialize the thread ************
@@ -84,7 +84,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
          */
         String addRFC = "ADD  " + userName;
         StringBuffer stringbuffer = new StringBuffer("LIST ");
-        for (ClientObject user : userArrayList) {
+        for (Client user : clientList) {
             /**
              * * Check the Room Name ****
              */
@@ -97,8 +97,8 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
         /**
          * *** Add a user in to array list **
          */
-        clientObject = new ClientObject(clientSocket, userName, ROOM_NAME);
-        userArrayList.add(clientObject);
+        client = new Client(clientSocket, userName, ROOM_NAME);
+        clientList.add(client);
 
         /**
          * ****** Sending the Complete User List to the New User **********
@@ -117,16 +117,16 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param newRoomName
      */
     public void changeRoom(Socket clientSocket, String userName, String newRoomName) {
-        int clientIndex = getIndexOf(userName);
+        int clientIndex = clientList.indexOf(userName);//getIndexOf(userName);
         if (clientIndex >= 0) {
             /**
              * ******
              * Update the Old Room to New Room and send the RFC ********
              */
-            ClientObject TempClientObject = userArrayList.get(clientIndex);
-            String oldRoomName = TempClientObject.getClientRoomName();
-            TempClientObject.setClientRoomName(newRoomName);
-            userArrayList.set(clientIndex, TempClientObject);
+            Client tempClient = clientList.get(clientIndex);
+            String oldRoomName = tempClient.getClientRoomName();
+            tempClient.setClientRoomName(newRoomName);
+            clientList.set(clientIndex, tempClient);
             sendMessageToClient(clientSocket, "CHRO " + newRoomName);
 
             /**
@@ -135,7 +135,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
              * socket **
              */
             StringBuffer stringbuffer = new StringBuffer("LIST ");
-            for (ClientObject user : userArrayList) {
+            for (Client user : clientList) {
                 /**
                  * * Check the Room Name ****
                  */
@@ -151,7 +151,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
              */
             String oldRoomRFC = "LERO " + userName + "~" + newRoomName;
             String newRoomRFC = "JORO " + userName;
-            for (ClientObject user : userArrayList) {
+            for (Client user : clientList) {
                 if (user.getClientRoomName().equals(oldRoomName)) {
                     sendMessageToClient(user.getClientSocket(), oldRoomRFC);
                 }
@@ -179,15 +179,15 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
         } catch (IOException ie) {
             ie.printStackTrace();
         }
-        userArrayList = null;
-        messageArrayList = null;
+        clientList = null;
+        messageList = null;
     }
 
     /**
      * ******* Function To Get the Object Of Given User Name ********
      */
-    private ClientObject getClientObject(String userName) {
-        for (ClientObject user : userArrayList) {
+    private Client getClient(String userName) {
+        for (Client user : clientList) {
             if (user.getClientUserName().equalsIgnoreCase(userName)) {
                 return user;
             }
@@ -206,10 +206,10 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
         try {
             File x = new File("server.properties");
             if (x.exists()) {
-                InputStream inputstream = this.getClass().getResourceAsStream("server.properties");
-                //this.getClass().getClassLoader().getResourceAsStream("server.properties");
-                propertiesLocal.load(inputstream);
-                inputstream.close();
+                try (InputStream inputstream = this.getClass().getResourceAsStream("server.properties")) {
+                    //this.getClass().getClassLoader().getResourceAsStream("server.properties");
+                    propertiesLocal.load(inputstream);
+                }
             } else {
                 Formatter f = new Formatter(x);
                 f.format("portno=%d\r\n", PORT_NUMBER);
@@ -237,22 +237,22 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      */
     //NO NEED THIS FUNCTION
     // USE indexOf() in ArrayList
-    private int getIndexOf(String userName) {
-        for (ClientObject user : userArrayList) {
-            if (user.getClientUserName().equalsIgnoreCase(userName)) {
-                return userArrayList.indexOf(user);
-            }
-        }
-        return -1;
-    }
+//    private int getIndexOf(String userName) {
+//        for (Client user : clientList) {
+//            if (user.getClientUserName().equalsIgnoreCase(userName)) {
+//                return clientList.indexOf(user);
+//            }
+//        }
+//        return -1;
+//    }
 
     /**
      * ********* Function to Get Remote User Address *****************
      */
     protected void getRemoteUserAddress(Socket clientSocket, String toUserName, String fromUserName) {
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(),
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(),
                     "REIP " + fromUserName + "~" + clientSocket.getInetAddress().getHostAddress());
         }
 
@@ -263,7 +263,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      */
     protected void getUserCount(Socket clientSocket, String roomName) {
         int userCount = 0;
-        for (ClientObject user : userArrayList) {
+        for (Client user : clientList) {
             if (user.getClientRoomName().equals(roomName)) {
                 userCount++;
             }
@@ -275,7 +275,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * *** Function To Check whether the Username is Already Exists *********
      */
     private boolean isUserExists(String userName) {
-        if (getClientObject(userName) != null) {
+        if (getClient(userName) != null) {
             return true;
         } else {
             return false;
@@ -289,9 +289,9 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param toUserName
      */
     protected void quitVideoChat(String toUserName) {
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "QUVC");
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(), "QUVC");
         }
     }
 
@@ -304,9 +304,9 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      */
     protected void quitVoiceChat(String fromUserName, String toUserName) {
         System.out.println(fromUserName + "-->" + toUserName);
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "QVCT " + fromUserName + "~" + toUserName);
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(), "QVCT " + fromUserName + "~" + toUserName);
         }
 
     }
@@ -319,9 +319,9 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param toUserName
      */
     protected void rejectCall(String fromUserName, String toUserName) {
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "REJC " + fromUserName + "~" + toUserName);
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(), "REJC " + fromUserName + "~" + toUserName);
         }
 
     }
@@ -334,22 +334,22 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param roomName
      * @param removeType
      */
-    public void removeUser(String userName, String roomName, int removeType) {
-        ClientObject removeclientobject = getClientObject(userName);
-        if (removeclientobject != null) {
-            userArrayList.remove(removeclientobject);
-            userArrayList.trimToSize();
+    public void removeUser(String userName, String roomName, CommonSetting removeType) {
+        Client removeClient = getClient(userName);
+        if (removeClient != null) {
+            clientList.remove(removeClient);
+            clientList.trimToSize();
             String removeRFC = null;
-            if (removeType == REMOVE_USER) {
+            if (removeType.equals(CommonSetting.REMOVE_USER)) {
                 removeRFC = "REMO " + userName;
             }
-            if (removeType == KICK_USER) {
+            if (removeType == CommonSetting.KICK_USER) {
                 removeRFC = "INKI " + userName;
             }
             /**
              * *** Send a REMO RFC to all other Users ***
              */
-            for (ClientObject user : userArrayList) {
+            for (Client user : clientList) {
                 if (user.getClientRoomName().equals(roomName)) {
                     sendMessageToClient(user.getClientSocket(), removeRFC);
                 }
@@ -365,17 +365,17 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      */
     protected void removeUserWhenException(Socket clientSocket) {
         String removeUserName, removeRoomName;
-        for (ClientObject removeClientObject : userArrayList) {
-            if (removeClientObject.getClientSocket().equals(clientSocket)) {
-                removeUserName = removeClientObject.getClientUserName();
-                removeRoomName = removeClientObject.getClientRoomName();
-                userArrayList.remove(removeClientObject);
-                userArrayList.trimToSize();
+        for (Client removeClient : clientList) {
+            if (removeClient.getClientSocket().equals(clientSocket)) {
+                removeUserName = removeClient.getClientUserName();
+                removeRoomName = removeClient.getClientRoomName();
+                clientList.remove(removeClient);
+                clientList.trimToSize();
                 String removeRFC = "REMO " + removeUserName;
                 /**
                  * *** Send a REMO RFC to all other Users ***
                  */
-                for (ClientObject user : userArrayList) {
+                for (Client user : clientList) {
                     if (user.getClientRoomName().equals(removeRoomName)) {
                         sendMessageToClient(user.getClientSocket(), removeRFC);
                     }
@@ -393,10 +393,10 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param toUserName
      */
     protected void requestForVoiceChat(Socket clientSocket, String fromUserName, String toUserName) {
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "REQU "
-                    + getClientObject(fromUserName).getClientSocket().getInetAddress().getHostAddress() + "~" + fromUserName);
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(), "REQU "
+                    + getClient(fromUserName).getClientSocket().getInetAddress().getHostAddress() + "~" + fromUserName);
         }
 
     }
@@ -433,17 +433,17 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      */
     protected void sendGeneralMessage(Socket clientSocket, String message, String userName, String roomName) {
         boolean floodFlag = false;
-        messageArrayList.add(userName);
-        if (messageArrayList.size() > MAX_MESSAGE) {
-            messageArrayList.remove(0);
-            messageArrayList.trimToSize();
+        messageList.add(userName);
+        if (messageList.size() > MAX_MESSAGE) {
+            messageList.remove(0);
+            messageList.trimToSize();
 
             /**
              * ******* Check Whether the User is flooding the message ********
              */
-            String firstMessage = messageArrayList.get(0);
-            for (count = 1; count < messageArrayList.size(); count++) {
-                if (messageArrayList.get(count).equals(firstMessage)) {
+            String firstMessage = messageList.get(0);
+            for (count = 1; count < messageList.size(); count++) {
+                if (messageList.get(count).equals(firstMessage)) {
                     floodFlag = true;
                 } else {
                     floodFlag = false;
@@ -456,7 +456,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
          * ****** Sending a General Message to All the Users ******
          */
         String messageRFC = "MESS " + userName + ":" + message;
-        for (ClientObject user : userArrayList) {
+        for (Client user : clientList) {
             if ((user.getClientRoomName().equals(roomName)) && (!(user.getClientUserName().equals(userName)))) {
                 sendMessageToClient(user.getClientSocket(), messageRFC);
             }
@@ -467,7 +467,7 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
          */
         if (floodFlag) {
             sendMessageToClient(clientSocket, "KICK ");
-            messageArrayList.clear();
+            messageList.clear();
         }
 
     }
@@ -492,9 +492,9 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param toUserName
      */
     protected void sendPrivateMessage(String message, String toUserName) {
-        clientObject = getClientObject(toUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "PRIV " + message);
+        client = getClient(toUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(), "PRIV " + message);
         }
 
     }
@@ -508,9 +508,9 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param fromUserName
      */
     protected void sendRemoteUserAddress(Socket clientSocket, String toUserName, String fromUserName) {
-        clientObject = getClientObject(fromUserName);
-        if (clientObject != null) {
-            sendMessageToClient(clientObject.getClientSocket(),
+        client = getClient(fromUserName);
+        if (client != null) {
+            sendMessageToClient(client.getClientSocket(),
                     "AEIP " + toUserName + "~" + clientSocket.getInetAddress().getHostAddress());
         }
     }
@@ -524,10 +524,10 @@ public class ChatServer implements Serializable, Runnable, CommonSettings {
      * @param toUserName
      */
     protected void sendUserIP(Socket clientSocket, String fromUserName, String toUserName) {
-        clientObject = getClientObject(toUserName);
+        client = getClient(toUserName);
         if (clientSocket != null) {
-            sendMessageToClient(clientObject.getClientSocket(), "ADDR "
-                    + getClientObject(fromUserName).getClientSocket().getInetAddress().getHostAddress() + "~" + fromUserName);
+            sendMessageToClient(client.getClientSocket(), "ADDR "
+                    + getClient(fromUserName).getClientSocket().getInetAddress().getHostAddress() + "~" + fromUserName);
         }
     }
 }

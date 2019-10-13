@@ -1,5 +1,6 @@
 package chat.client.move;
 
+import chat.client.MessageObject;
 import java.awt.Dimension;
 import java.awt.Canvas;
 import java.util.ArrayList;
@@ -29,26 +30,26 @@ public class ImageCanvas extends Canvas implements CommonSettings {
     }
 
     protected void AddIconsToMessageObject() {
-        int StartX = IMAGE_CANVAS_START_POSITION;
-        int StartY = IMAGE_CANVAS_START_POSITION;
+        int startX = IMAGE_CANVAS_START_POSITION;
+        int startY = IMAGE_CANVAS_START_POSITION;
         for (count = 1; count <= chatclient.getIconCount(); count++) {
             messageObject = new MessageObject();
-            messageObject.message = (count - 1) + "";
-            messageObject.startX = StartX;
-            messageObject.startY = StartY;
-            messageObject.isImage = true;
-            messageObject.width = DEFAULT_ICON_WIDTH;
-            messageObject.height = DEFAULT_ICON_HEIGHT;
+            messageObject.setMessage ((count - 1) + "");
+            messageObject.setStartX(startX);
+            messageObject.setStartY(startY);
+            messageObject.setImage(true);
+            messageObject.setWidth(DEFAULT_ICON_WIDTH);
+            messageObject.setHeight(DEFAULT_ICON_HEIGHT);
             IconArray.add(messageObject);
             if (count % 3 == 0) {
-                StartX = IMAGE_CANVAS_START_POSITION;
-                StartY += DEFAULT_ICON_HEIGHT + DEFAULT_IMAGE_CANVAS_SPACE;
+                startX = IMAGE_CANVAS_START_POSITION;
+                startY += DEFAULT_ICON_HEIGHT + DEFAULT_IMAGE_CANVAS_SPACE;
             } else {
-                StartX += DEFAULT_ICON_WIDTH + DEFAULT_IMAGE_CANVAS_SPACE;
+                startX += DEFAULT_ICON_WIDTH + DEFAULT_IMAGE_CANVAS_SPACE;
             }
         }
 
-        scrollview.setValues(dimension.width, StartY);
+        scrollview.setValues(dimension.width, startY);
         scrollview.setScrollPos(1, 1);
         scrollview.setScrollSteps(2, 1, DEFAULT_SCROLLING_HEIGHT);
         repaint();

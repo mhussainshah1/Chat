@@ -16,6 +16,7 @@ import javax.swing.text.*;
 import javax.swing.text.html.*;
 
 public class ClientGui extends Thread {
+
     public static void main(String[] args) throws Exception {
         ClientGui client = new ClientGui();
     }
@@ -232,7 +233,7 @@ public class ClientGui extends Thread {
             System.exit(0);
         }
     }
-    
+
     // send html to pane
     private void appendToPane(JTextPane tp, String msg) {
         HTMLDocument doc = (HTMLDocument) tp.getDocument();
@@ -244,9 +245,8 @@ public class ClientGui extends Thread {
             e.printStackTrace();
         }
     }
-    
+
     //Inner Classes
-    
     // check if if all field are not empty
     public class TextListener implements DocumentListener {
 

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package chat.server;
 
 import java.awt.Color;
@@ -10,9 +5,6 @@ import java.awt.Font;
 import java.net.URL;
 import javax.swing.ImageIcon;
 
-/**
- * @author m_hus
- */
 public class Server extends javax.swing.JFrame {
 
     /**
@@ -20,7 +12,7 @@ public class Server extends javax.swing.JFrame {
      */
     public Server() {
         initComponents();
-        cs = new ChatServer();
+        chatServer = new ChatServer();
     }
 
     /**
@@ -87,19 +79,19 @@ public class Server extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cmdStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStartActionPerformed
-        cs.startServer();
+        chatServer.startServer();
         cmdStart.setEnabled(false);
         cmdStop.setEnabled(true);
     }//GEN-LAST:event_cmdStartActionPerformed
 
     private void cmdStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdStopActionPerformed
-        cs.stopServer();
+        chatServer.stopServer();
         cmdStop.setEnabled(false);
         cmdStart.setEnabled(true);
     }//GEN-LAST:event_cmdStopActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        cs.stopServer();
+        chatServer.stopServer();
         cmdStop.setEnabled(false);
         cmdStart.setEnabled(true);
         dispose();
@@ -155,7 +147,7 @@ public class Server extends javax.swing.JFrame {
         });
     }
 
-    private ChatServer cs;
+    private ChatServer chatServer;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel centerPanel;
     private javax.swing.JButton cmdStart;

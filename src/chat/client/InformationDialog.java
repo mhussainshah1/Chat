@@ -19,6 +19,7 @@ public class InformationDialog extends JDialog {
 
     /**
      * Creates new form InformationDialog1
+     * @param parent
      */
     public InformationDialog(JFrame parent) {//Change into JFram when chatClient JFrame is done
         super(parent, PRODUCT_NAME + " - Login", true);
@@ -182,10 +183,11 @@ public class InformationDialog extends JDialog {
         try {
             File x = new File("data.properties");
             if (x.exists()) {
-                InputStream inputstream = this.getClass().getResourceAsStream("data.properties");
                 //this.getClass().getClassLoader().getResourceAsStream("data.properties");
-                propertiesLocal.load(inputstream);
-                inputstream.close();
+                try (InputStream inputstream = this.getClass().getResourceAsStream("data.properties")) {
+                    //this.getClass().getClassLoader().getResourceAsStream("data.properties");
+                    propertiesLocal.load(inputstream);
+                }
             } else {
                 Formatter f = new Formatter(x);
                 f.format("TurtleUserName=%s\r\n", "amir");

@@ -7,17 +7,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ChatCommunication implements Runnable, CommonSettings {
+public class ChatCommunication implements Runnable/*, CommonSettings*/ {
 
     /**
      * ******** Global Variable Declarations **************
      */
-    Thread thread;
-    Socket socket;
-    //DataInputStream in;
-    String RFC;
-    ChatServer server;
-    BufferedReader in;
+    private Thread thread;
+    private Socket socket;
+    //private DataInputStream in;
+    private String RFC;
+    private ChatServer server;
+    private BufferedReader in;
 
     /**
      * ****** Initialize the Socket to the Client **********
@@ -62,12 +62,12 @@ public class ChatCommunication implements Runnable, CommonSettings {
                 }
                 if (RFC.startsWith("QUIT")) {
                     server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),
-                            REMOVE_USER);
+                            CommonSetting.REMOVE_USER);
                     quitConnection();
                 }
                 if (RFC.startsWith("KICK")) {
                     server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),
-                            KICK_USER);
+                            CommonSetting.KICK_USER);
                     quitConnection();
                 }
                 if (RFC.startsWith("CHRO")) {

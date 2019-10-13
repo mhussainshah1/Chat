@@ -2,12 +2,12 @@ package chat.server;
 
 import java.net.Socket;
 
-public class ClientObject {
+public class Client {
 
     private Socket clientSocket;
     private String clientUserName, clientRoomName;
 
-    public ClientObject(Socket clientSocket, String clientUserName, String clientRoomName) {
+    public Client(Socket clientSocket, String clientUserName, String clientRoomName) {
         this.clientSocket = clientSocket;
         this.clientUserName = clientUserName;
         this.clientRoomName = clientRoomName;

@@ -23,12 +23,12 @@ public class TestClientGUI extends javax.swing.JFrame {
     public TestClientGUI() {
 
         initComponents();
-        
+
         listModel = new DefaultListModel<>();
         listModel.addElement("Jane Doe");
         listModel.addElement("John Smith");
         listModel.addElement("Kathy Green");
-        
+
         userCanvas.setModel(listModel);
 
     }

@@ -1,5 +1,6 @@
 package chat.client.move;
 
+import chat.client.MessageObject;
 import java.awt.Dimension;
 import java.awt.Canvas;
 import java.util.ArrayList;

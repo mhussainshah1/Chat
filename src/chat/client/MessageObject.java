@@ -2,19 +2,21 @@ package chat.client;
 //This class is updated
 
 public class MessageObject {
-    //TO-Do
-    //Make all varibles private and use bean methods in class
     
-    String message;//null
-    int startX;
-    int startY;
-    int width;
-    int height;//0
-    boolean isImage;
-    boolean selected;
-    boolean isIgnored; //false
-    int MessageType;//0
+    private String message;//null
+    private int startX;
+    private int startY;
+    private int width;
+    private int height;//0
+    private boolean image;
+    private boolean selected;
+    private boolean ignore; //false
+    private int MessageType;//0
 
+    public MessageObject() {
+    }
+
+    
     public String getMessage() {
         return message;
     }
@@ -55,12 +57,12 @@ public class MessageObject {
         this.height = height;
     }
 
-    public boolean isIsImage() {
-        return isImage;
+    public boolean isImage() {
+        return image;
     }
 
-    public void setIsImage(boolean isImage) {
-        this.isImage = isImage;
+    public void setImage(boolean image) {
+        this.image = image;
     }
 
     public boolean isSelected() {
@@ -71,12 +73,12 @@ public class MessageObject {
         this.selected = selected;
     }
 
-    public boolean isIsIgnored() {
-        return isIgnored;
+    public boolean isIgnore() {
+        return ignore;
     }
 
-    public void setIsIgnored(boolean isIgnored) {
-        this.isIgnored = isIgnored;
+    public void setIgnore(boolean ignore) {
+        this.ignore = ignore;
     }
 
     public int getMessageType() {
@@ -85,7 +87,5 @@ public class MessageObject {
 
     public void setMessageType(int MessageType) {
         this.MessageType = MessageType;
-    }
-
-    
+    }    
 }

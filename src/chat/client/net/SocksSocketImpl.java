@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 
 import java.net.Socket;
 import java.net.SocketImpl;
@@ -115,6 +114,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @return the value of this socket's <code>localport</code> field.
      * @see	java.net.SocketImpl#localport
      */
+    @Override
     protected int getLocalPort() {
         return localport;
     }
@@ -125,6 +125,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @return the value of this socket's <code>address</code> field.
      * @see	java.net.SocketImpl#address
      */
+    @Override
     protected InetAddress getInetAddress() {
         return address;
     }
@@ -135,6 +136,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @return the value of this socket's <code>port</code> field.
      * @see	java.net.SocketImpl#port
      */
+    @Override
     protected int getPort() {
         return port;
     }
@@ -152,6 +154,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
         this.stream = stream;
     }
 
+    @Override
     protected void sendUrgentData(int data) {
         /**
          * *******Do Nothing *******
@@ -210,6 +213,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * create a datagram socket.
      * @exception IOException if an I/O error occurs while creating the socket.
      */
+    @Override
     protected void create(boolean stream) throws IOException {
         //Nothing since it's always a socket connection between local host and proxy server.
     }
@@ -221,6 +225,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @param	port the port number.
      * @exception IOException if an I/O error occurs when binding this socket.
      */
+    @Override
     protected void bind(InetAddress address, int port) throws IOException {
         this.localAddress = address;
         this.localport = port;
@@ -234,6 +239,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @exception IOException if an I/O error occurs when connecting to the
      * remote host.
      */
+    @Override
     protected void connect(String host, int port) throws UnknownHostException, IOException {
         try {
             if (proxyAddress == null)//Direct Socket Connection
@@ -260,6 +266,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @exception IOException if an I/O error occurs when attempting a
      * connection.
      */
+    @Override
     protected void connect(InetAddress address, int port) throws IOException {
         try {
             if (stream)// Stream socket connection
@@ -305,6 +312,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
         }
     }
 
+    @Override
     protected void connect(SocketAddress address, int port) throws IOException {
         /**
          * ********Do Nothing *********
@@ -318,6 +326,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @exception IOException if an I/O error occurs when creating the input
      * stream.
      */
+    @Override
     protected synchronized InputStream getInputStream() throws IOException {
         if (clientSocket != null) {
             return clientSocket.getInputStream();
@@ -333,6 +342,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @exception IOException if an I/O error occurs when creating the output
      * stream.
      */
+    @Override
     protected synchronized OutputStream getOutputStream() throws IOException {
         if (clientSocket != null) {
             return clientSocket.getOutputStream();
@@ -350,6 +360,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
      * @exception IOException if an I/O error occurs when determining the number
      * of bytes available.
      */
+    @Override
     protected synchronized int available() throws IOException {
         return getInputStream().available();
     }
@@ -385,7 +396,7 @@ class SocksSocketImpl extends SocketImpl implements SocksSocketConstants {
             remoteHost = host.getBytes();
             this.address = InetAddress.getByName(host);
             remoteAddress = getAddress(address);
-        } catch (Exception uhe)//Use it to catch security exception
+        } catch (UnknownHostException uhe)//Use it to catch security exception
         //		catch(UnknownHostException uhe)
         {
             switch (version) {
