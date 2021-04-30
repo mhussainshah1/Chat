@@ -7,19 +7,19 @@
 This Java Chat Application developed by my own interest, and now i am interested to share my source code with other peoples to get learn from it. I request everyone, if suppose you are using this for any college project, just dont submit as it is. Try to understand the coding and use this application for a reference and develop with your own knowledge. In Anytime, If you need any help contact me through mail.
 
 ### Requirements
-	* Java Run Time Environment 8 or Higer
+	* Java Run Time Environment 8 or Higher
 
 ### RFC Used In Chat
-|RFC |			Description				|
-|----|:--------------------------------------------------------:|
-|HELO| - Initialize Connection To Server 			|
-|QUIT| - Remove Users From Chat					|
-|KICK| - Kickoff From Chat					|
-|CHRO| - Change Room						|
-|MESS| - Send General Message 					|
-|PRIV| - Send Private Message					|
-|ROCO| - Get Users Count in Specfied Room			|
-|CALL| - Request for Voice Chat (Not Included with this one)	|
+|RFC |			Description				| <br>
+|----|:--------------------------------------------------------:|<br>
+|HELO| - Initialize Connection To Server			|<br>
+|QUIT| - Remove Users From Chat					|<br>
+|KICK| - Kickoff From Chat					|<br>
+|CHRO| - Change Room						|<br>
+|MESS| - Send General Message 					|<br>
+|PRIV| - Send Private Message					|<br>
+|ROCO| - Get Users Count in Specified Room			|<br>
+|CALL| - Request for Voice Chat (Not Included with this one)	|<br>
 
 ### How To Run Application
 

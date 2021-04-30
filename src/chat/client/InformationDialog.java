@@ -4,10 +4,8 @@ package chat.client;
 import static chat.client.CommonSettings.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Formatter;
 import java.util.Properties;
-import java.util.Scanner;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -19,6 +17,7 @@ public class InformationDialog extends JDialog {
 
     /**
      * Creates new form InformationDialog1
+     *
      * @param parent
      */
     public InformationDialog(JFrame parent) {//Change into JFram when chatClient JFrame is done
@@ -44,6 +43,7 @@ public class InformationDialog extends JDialog {
 
         //setSize(250, 400);
         chatClient.setVisible(true);//show();
+        
         setVisible(true);
     }
 
@@ -179,17 +179,15 @@ public class InformationDialog extends JDialog {
     }
 
     private Properties getProperties() {
-        Properties propertiesLocal = new Properties();
+        var propertiesLocal = new Properties();
         try {
-            File x = new File("data.properties");
-            if (x.exists()) {
-                //this.getClass().getClassLoader().getResourceAsStream("data.properties");
-                try (InputStream inputstream = this.getClass().getResourceAsStream("data.properties")) {
-                    //this.getClass().getClassLoader().getResourceAsStream("data.properties");
+            var file = new File("data.properties");
+            if (file.exists()) {
+                try ( var inputstream = this.getClass().getClassLoader().getResourceAsStream("data.properties")) {
                     propertiesLocal.load(inputstream);
                 }
             } else {
-                Formatter f = new Formatter(x);
+                var f = new Formatter(file);
                 f.format("TurtleUserName=%s\r\n", "amir");
                 f.format("TurtleServerName=%s\r\n", "");
                 f.format("TurtleProxyPort=%s\r\n", "");
@@ -198,11 +196,8 @@ public class InformationDialog extends JDialog {
                 f.format("TurtleProxyState=%s", false);
                 f.close();
 
-                Scanner sc = new Scanner(x);
-                while (sc.hasNext()) {
-                    System.out.println(sc.next());
-                }
-                sc.close();
+                // print everything
+                propertiesLocal.forEach((k, v) -> System.out.println(k + "=" + v));
             }
         } catch (java.io.IOException | java.lang.NullPointerException exc) {
             exc.printStackTrace();
@@ -214,7 +209,7 @@ public class InformationDialog extends JDialog {
     private void setProperties(Properties properties) {
         this.properties = properties;
         try {
-            FileOutputStream fout = new FileOutputStream(new File("data.properties"));
+            var fout = new FileOutputStream(new File("data.properties"));
             if (isProxyCheckBox()) { //isProxyCheckBox.getState() == true
                 properties.setProperty("TurtleProxyState", "true");
             } else {

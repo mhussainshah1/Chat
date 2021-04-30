@@ -2,7 +2,6 @@ package help;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -89,6 +88,7 @@ public class ClientGui extends Thread {
 
         jtextInputChat.addKeyListener(new KeyAdapter() {
             // send message on Enter
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     sendMessage();
@@ -162,7 +162,8 @@ public class ClientGui extends Thread {
                 serverName = jtfAddr.getText();
                 PORT = Integer.parseInt(port);
 
-                appendToPane(jtextFilDiscu, "<span>Connecting to " + serverName + " on port " + PORT + "...</span>");
+                appendToPane(jtextFilDiscu, "<span>Connecting to " + serverName 
+                        + " on port " + PORT + "...</span>");
                 server = new Socket(serverName, PORT);
 
                 appendToPane(jtextFilDiscu, "<span>Connected to "
@@ -195,25 +196,22 @@ public class ClientGui extends Thread {
         });
 
         // on disconnection
-        jsbtndeco.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                jfr.add(jtfName);
-                jfr.add(jtfport);
-                jfr.add(jtfAddr);
-                jfr.add(jcbtn);
-                jfr.remove(jsbtn);
-                jfr.remove(jtextInputChatSP);
-                jfr.remove(jsbtndeco);
-                jfr.revalidate();
-                jfr.repaint();
-                read.interrupt();
-                jtextListUsers.setText(null);
-                jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
-                jtextListUsers.setBackground(Color.LIGHT_GRAY);
-                appendToPane(jtextFilDiscu, "<span>Connection closed.</span>");
-                output.close();
-            }
+        jsbtndeco.addActionListener((ActionEvent ae) -> {
+            jfr.add(jtfName);
+            jfr.add(jtfport);
+            jfr.add(jtfAddr);
+            jfr.add(jcbtn);
+            jfr.remove(jsbtn);
+            jfr.remove(jtextInputChatSP);
+            jfr.remove(jsbtndeco);
+            jfr.revalidate();
+            jfr.repaint();
+            read.interrupt();
+            jtextListUsers.setText(null);
+            jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
+            jtextListUsers.setBackground(Color.LIGHT_GRAY);
+            appendToPane(jtextFilDiscu, "<span>Connection closed.</span>");
+            output.close();
         });
     }
 
@@ -287,12 +285,12 @@ public class ClientGui extends Thread {
                 jcbtn.setEnabled(true);
             }
         }
-
     }
 
     // read new incoming messages
-    class Read extends Thread {
+    public class Read extends Thread {
 
+        @Override
         public void run() {
             String message;
             while (!Thread.currentThread().isInterrupted()) {
@@ -301,7 +299,7 @@ public class ClientGui extends Thread {
                     if (message != null) {
                         if (message.charAt(0) == '[') {
                             message = message.substring(1, message.length() - 1);
-                            ArrayList<String> ListUser = new ArrayList<String>(
+                            ArrayList<String> ListUser = new ArrayList<>(
                                     Arrays.asList(message.split(", "))
                             );
                             jtextListUsers.setText(null);

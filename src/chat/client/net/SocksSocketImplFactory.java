@@ -1,13 +1,9 @@
 package chat.client.net;
 
-import java.io.IOException;
-
-import java.net.Socket;
+import java.net.InetAddress;
 import java.net.SocketImpl;
 import java.net.SocketImplFactory;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Properties;
 
 /**

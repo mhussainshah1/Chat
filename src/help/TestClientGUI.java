@@ -1,36 +1,48 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package help;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
-/**
- *
- * @author m_hus
- */
 public class TestClientGUI extends javax.swing.JFrame {
 
-    private DefaultListModel<String> listModel;
 
-    /**
-     * Creates new form TestClientGUI
-     */
+
+    //Creates new form TestClientGUI
     public TestClientGUI() {
-
         initComponents();
 
+        //Load the user images and create an array of indexes.
+        images = new ArrayList<>();
+        userNames = Arrays.asList("Amir", "Ali", "Mo", "Cat", "Sam");
+        for (String userName : userNames) {
+            images.add(createImageIcon("images/icon.gif", userName));
+        }
         listModel = new DefaultListModel<>();
-        listModel.addElement("Jane Doe");
-        listModel.addElement("John Smith");
-        listModel.addElement("Kathy Green");
+        listModel.addAll(images);
 
-        userCanvas.setModel(listModel);
-
+        userList.setCellRenderer(new ListRenderer());
+        userList.setModel(listModel);
     }
 
     /**
@@ -51,7 +63,7 @@ public class TestClientGUI extends javax.swing.JFrame {
         jsbtn = new javax.swing.JButton();
         jsbtndeco = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        userCanvas = new javax.swing.JList<>();
+        userList = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Chat");
@@ -79,6 +91,11 @@ public class TestClientGUI extends javax.swing.JFrame {
         jtextInputChat.setFont(new java.awt.Font("Arial", 0, 15)); // NOI18N
         jtextInputChat.setToolTipText("");
         jtextInputChat.setMargin(new Insets(6,6,6,6));
+        jtextInputChat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtextInputChatActionPerformed(evt);
+            }
+        });
         jtextInputChat.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jtextInputChatKeyPressed(evt);
@@ -109,13 +126,13 @@ public class TestClientGUI extends javax.swing.JFrame {
         getContentPane().add(jsbtndeco);
         jsbtndeco.setBounds(280, 250, 110, 27);
 
-        userCanvas.setName(""); // NOI18N
-        userCanvas.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+        userList.setName(""); // NOI18N
+        userList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                userCanvasValueChanged(evt);
+                userListValueChanged(evt);
             }
         });
-        jScrollPane1.setViewportView(userCanvas);
+        jScrollPane1.setViewportView(userList);
 
         getContentPane().add(jScrollPane1);
         jScrollPane1.setBounds(400, 0, 100, 200);
@@ -124,24 +141,49 @@ public class TestClientGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jtextInputChatKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtextInputChatKeyPressed
-        // TODO add your handling code here:
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            sendMessage();
+        }
+        // Get last message typed
+        if (evt.getKeyCode() == KeyEvent.VK_UP) {
+            String currentMessage = jtextInputChat.getText().trim();
+            jtextInputChat.setText(oldMsg);
+            oldMsg = currentMessage;
+        }
+        if (evt.getKeyCode() == KeyEvent.VK_DOWN) {
+            String currentMessage = jtextInputChat.getText().trim();
+            jtextInputChat.setText(oldMsg);
+            oldMsg = currentMessage;
+        }
     }//GEN-LAST:event_jtextInputChatKeyPressed
 
     private void jsbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsbtnActionPerformed
-        // TODO add your handling code here:
-
+        sendMessage();
     }//GEN-LAST:event_jsbtnActionPerformed
 
-    private void userCanvasValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_userCanvasValueChanged
-        // TODO add your handling code here:
+    private void userListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_userListValueChanged
         JOptionPane.showMessageDialog(this, "Item Clicked");
-    }//GEN-LAST:event_userCanvasValueChanged
+    }//GEN-LAST:event_userListValueChanged
 
     private void jsbtndecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jsbtndecoActionPerformed
-        // TODO add your handling code here:
         listModel.removeElement(jtextInputChat.getText());
         //listModel.clear();
+        remove(jsbtn);
+        remove(jtextInputChatSP);
+        remove(jsbtndeco);
+        revalidate();
+        repaint();
+        read.interrupt();
+        jtextListUsers.setText(null);
+        jtextFilDiscu.setBackground(Color.LIGHT_GRAY);
+        jtextListUsers.setBackground(Color.LIGHT_GRAY);
+        appendToPane(jtextFilDiscu, "<span>Connection closed.</span>");
+        output.close();
     }//GEN-LAST:event_jsbtndecoActionPerformed
+
+    private void jtextInputChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtextInputChatActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtextInputChatActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,11 +213,61 @@ public class TestClientGUI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new TestClientGUI().setVisible(true);
-        });
+        java.awt.EventQueue.invokeLater(() -> new TestClientGUI().setVisible(true));
     }
 
+    // sending messages
+    public void sendMessage() {
+        try {
+            String message = jtextInputChat.getText().trim();
+            if (message.equals("")) {
+                return;
+            }
+            this.oldMsg = message;
+            output.println(message);
+            jtextInputChat.requestFocus();
+            jtextInputChat.setText(null);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     */
+    protected static ImageIcon createImageIcon(String path, String description) {
+        URL imgURL = TestClientGUI.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL, description);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
+
+    // send html to pane
+    private void appendToPane(JTextPane tp, String msg) {
+        HTMLDocument doc = (HTMLDocument) tp.getDocument();
+        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
+        try {
+            editorKit.insertHTML(doc, doc.getLength(), msg, 0, 0, null);
+            tp.setCaretPosition(doc.getLength());
+        } catch (IOException | BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+    private String oldMsg = "";
+    private Thread read;
+    private String serverName;
+    private int PORT;
+    private String name;
+    BufferedReader input;
+    PrintWriter output;
+    Socket server;
+    private DefaultListModel<ImageIcon> listModel;
+    private List<ImageIcon> images;
+    private List<String> userNames;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jsbtn;
@@ -186,6 +278,61 @@ public class TestClientGUI extends javax.swing.JFrame {
     private javax.swing.JTextField jtextInputChat;
     private javax.swing.JScrollPane jtextInputChatSP;
     private javax.swing.JTextPane jtextListUsers;
-    private javax.swing.JList<String> userCanvas;
+    private javax.swing.JList<ImageIcon> userList;
     // End of variables declaration//GEN-END:variables
+
+    class ListRenderer extends JLabel
+            implements ListCellRenderer<ImageIcon> {
+
+        private Font uhOhFont;
+
+        public ListRenderer() {
+            setOpaque(true);
+        }
+
+        /*
+         * This method finds the image and text corresponding
+         * to the selected value and returns the label, set up
+         * to display the text and image.
+         */
+        @Override
+        public Component getListCellRendererComponent(
+                JList<? extends ImageIcon> list,
+                ImageIcon icon,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+            //Get the selected index. (The index param isn't
+            //always valid, so just use the value.)
+
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            //Set the icon and text.  If icon was null, say so.
+            String userName = userNames.get(index);
+            setIcon(icon);
+            if (icon != null) {
+                setText(userName);
+                setFont(list.getFont());
+            } else {
+                setUhOhText(userName + " (no image available)", list.getFont());
+            }
+            return this;
+        }
+
+        //Set the font and text when no image was found.
+        protected void setUhOhText(String uhOhText, Font normalFont) {
+            if (uhOhFont == null) { //lazily create this font
+                uhOhFont = normalFont.deriveFont(Font.ITALIC);
+            }
+            setFont(uhOhFont);
+            setText(uhOhText);
+        }
+    }
+
 }

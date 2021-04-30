@@ -1,5 +1,6 @@
 package chat.server;
 
+import static chat.server.CommonSetting.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 //import java.io.DataInputStream;
@@ -9,9 +10,6 @@ import java.net.Socket;
 
 public class ChatCommunication implements Runnable/*, CommonSettings*/ {
 
-    /**
-     * ******** Global Variable Declarations **************
-     */
     private Thread thread;
     private Socket socket;
     //private DataInputStream in;
@@ -61,13 +59,11 @@ public class ChatCommunication implements Runnable/*, CommonSettings*/ {
                     server.addUser(socket, RFC.substring(5));
                 }
                 if (RFC.startsWith("QUIT")) {
-                    server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),
-                            CommonSetting.REMOVE_USER);
+                    server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),REMOVE_USER);
                     quitConnection();
                 }
                 if (RFC.startsWith("KICK")) {
-                    server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),
-                            CommonSetting.KICK_USER);
+                    server.removeUser(RFC.substring(5, RFC.indexOf("~")), RFC.substring(RFC.indexOf("~") + 1),KICK_USER);
                     quitConnection();
                 }
                 if (RFC.startsWith("CHRO")) {

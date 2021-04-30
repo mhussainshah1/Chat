@@ -282,6 +282,7 @@ public class SocksSocket extends Socket {
      *
      * @return the remote port number to which this socket is connected.
      */
+    @Override
     public int getPort() {
         return impl.getPort();
     }
@@ -292,6 +293,7 @@ public class SocksSocket extends Socket {
      *
      * @see #setReceiveBufferSize
      */
+    @Override
     public synchronized int getReceiveBufferSize() throws SocketException {
         int result = 0;
         Object o = impl.getOption(SocketOptions.SO_RCVBUF);
@@ -304,6 +306,7 @@ public class SocksSocket extends Socket {
     /**
      * Enable/disable TCP_NODELAY (disable/enable Nagle's algorithm).
      */
+    @Override
     public void setTcpNoDelay(boolean on) throws SocketException {
         impl.setOption(SocketOptions.TCP_NODELAY, on);
     }
@@ -316,6 +319,7 @@ public class SocksSocket extends Socket {
      * @param linger how to linger for, if on is true.
      * @exception IllegalArgumentException if the linger value is negative.
      */
+    @Override
     public void setSoLinger(boolean on, int linger) throws SocketException {
         if (on) {
             if (linger < 0) {
@@ -340,6 +344,7 @@ public class SocksSocket extends Socket {
      * timeout must be > 0. A timeout of zero is interpreted as an infinite
      * timeout.
      */
+    @Override
     public synchronized void setSoTimeout(int timeout) throws SocketException {
         impl.setOption(SocketOptions.SO_TIMEOUT, timeout);
     }
@@ -365,6 +370,7 @@ public class SocksSocket extends Socket {
      *
      * @exception IllegalArgumentException if the value is 0 or is negative.
      */
+    @Override
     public synchronized void setSendBufferSize(int size) throws SocketException {
         if (!(size > 0)) {
             throw new IllegalArgumentException("negative send size");
@@ -393,6 +399,7 @@ public class SocksSocket extends Socket {
      *
      * @exception IllegalArgumentException if the value is 0 or is negative.
      */
+    @Override
     public synchronized void setReceiveBufferSize(int size) throws SocketException {
         if (size < 0) {
             throw new IllegalArgumentException("invalid receive size");
