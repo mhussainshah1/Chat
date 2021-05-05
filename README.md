@@ -34,6 +34,6 @@ This Java Chat Application developed by my own interest, and now i am interested
  * run chatclient.jar , and enter the username and give the machine name of chatserver (if the server runs on same machine just give localhost as a servername) and click Connect Button.
 
 ### Conclusion
-So, i hope this will satisfy your requirements in some way. plz email me at mhussainshah79@gmail.com and give me your feedback about it. 
+So, i hope this will satisfy your requirements in some way. please email me at mhussainshah79@gmail.com and give me your feedback about it. 
 	
 

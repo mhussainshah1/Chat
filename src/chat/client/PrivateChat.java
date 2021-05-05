@@ -276,8 +276,8 @@ public class PrivateChat extends javax.swing.JFrame implements CommonSettings {
 
     // send html to pane
     private void appendToPane(JTextPane tp, String message) {
-        HTMLDocument doc = (HTMLDocument) tp.getDocument();
-        HTMLEditorKit editorKit = (HTMLEditorKit) tp.getEditorKit();
+        var doc = (HTMLDocument) tp.getDocument();
+        var editorKit = (HTMLEditorKit) tp.getEditorKit();
         try {
             editorKit.insertHTML(doc, doc.getLength(), message, 0, 0, null);
             tp.setCaretPosition(doc.getLength());

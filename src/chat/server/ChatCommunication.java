@@ -52,6 +52,7 @@ public class ChatCommunication implements Runnable/*, CommonSettings*/ {
         while (thread != null) {
             try {
                 RFC = in.readLine();
+                System.out.println(RFC);
                 /**
                  * ***** RFC Checking *************
                  */
